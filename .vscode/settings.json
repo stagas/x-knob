@@ -1,0 +1,12 @@
+{
+  "files.exclude": {
+    ".husky": false,
+    ".npmrc": true,
+    ".gitignore": true,
+    ".gitattributes": true,
+    ".prettierignore": true,
+    "coverage": true
+  },
+  "todo-tree.tree.scanMode": "workspace only",
+  "npm-scripts.showStartNotification": false
+}
