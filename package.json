@@ -3,7 +3,7 @@
   "author": "stagas",
   "short": "stagas/x-knob",
   "description": "web component that creates knobs for input ranges",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -81,7 +81,7 @@
     "wait-for-the-element": "^4.0.1"
   },
   "dependencies": {
-    "@stagas/vele": "file:../vele",
+    "@stagas/vele": "^0.1.0",
     "memoize-pure": "^1.0.0",
     "setter-decorator": "^1.0.0",
     "with-properties": "^0.1.0"
