@@ -45,7 +45,7 @@
     "prepack": "npm run clean && npm run build",
     "prepack:dry": "npm pack --dry-run",
     "prepush": "npm run lint && npm run test",
-    "prepare": "husky install"
+    "prepare": "husky install && node .pull-configs.js"
   },
   "devDependencies": {
     "@n1kk/intspector": "^1.0.2",
@@ -71,6 +71,7 @@
     "jest-browser-globals": "^25.1.0-beta",
     "onchange": "^7.1.0",
     "prettier": "^2.5.1",
+    "pull-configs": "^0.1.1",
     "rimraf": "^3.0.2",
     "terser": "^5.10.0",
     "ts-jest": "^27.1.3",
