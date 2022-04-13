@@ -1,0 +1,1929 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='50' cy='47.2' r='34'%0Afill='transparent' stroke='%23fff' stroke-width='7.5' /%3E%3C/svg%3E"
+      type="image/svg+xml"
+    />
+    <title>web</title>
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        --light: #eee;
+        --dark: #222;
+        --color: var(--dark);
+        --background: var(--light);
+        color: var(--color);
+        background: var(--background)
+      }
+
+      @media (prefers-color-scheme: dark) {
+        body:not(.light) {
+          --color: var(--light);
+          --background: var(--dark);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main></main>
+    <script type="module">const kebab = (s)=>s.replace(/[a-z](?=[A-Z])|[A-Z]+(?=[A-Z][a-z])/g, '$&-').toLowerCase()
+;
+const toCssText = (style)=>{
+    let css = '';
+    for(const key in style)css += kebab(key) + ':' + style[key] + ';';
+    return css;
+};
+const createProp = (doc = html, el, _type, name, value, attrs)=>{
+    switch(name){
+        case 'children':
+        case 'ref':
+            return;
+        case 'style':
+            value = value?.valueOf();
+            if (typeof value === 'object') value = toCssText(value);
+            el.setAttribute('style', value);
+            attrs.style = el.getAttributeNode('style');
+            return;
+    }
+    const attr = name
+    ;
+    value = value?.valueOf();
+    switch(typeof value){
+        case 'string':
+        case 'number':
+            if (doc === svg || !(name in el)) {
+                el.setAttribute(attr, value);
+                attrs[attr] = el.getAttributeNode(attr);
+                return;
+            }
+            break;
+        case 'function':
+            el.setAttribute(attr, '');
+            attrs[attr] = el.getAttributeNode(attr)
+            ;
+            el[name] = value;
+            return;
+    }
+    el[name] = value;
+    if (el.hasAttribute(attr)) attrs[attr] = el.getAttributeNode(attr);
+};
+const propCache = new WeakMap();
+const createProps = (doc, el, type, props = {}, attrs = {}, cacheRef = el)=>{
+    for(const name in props)createProp(doc, el, type, name, props[name], attrs);
+    propCache.set(cacheRef, {
+        props,
+        attrs
+    });
+};
+const updateProps = (doc, el, type, next = {}, cacheRef = el)=>{
+    if (!propCache.has(cacheRef)) return next && createProps(doc, el, type, next, void 0, cacheRef);
+    const c = propCache.get(cacheRef);
+    const { attrs , props  } = c;
+    if (!next) {
+        for(const name in attrs)el.removeAttributeNode(attrs[name]);
+        for(const name3 in props)delete el[name3];
+        propCache.delete(cacheRef);
+        return;
+    }
+    let value;
+    out: for(const name in props){
+        if (!(name in next)) {
+            delete el[name];
+            continue;
+        }
+        value = next[name];
+        switch(name){
+            case 'children':
+            case 'ref':
+                continue out;
+            case 'value':
+                value = value?.valueOf();
+                el[name] !== value && document.activeElement !== el && (el[name] = value);
+                continue out;
+        }
+        value = value?.valueOf()
+        ;
+        if (props[name] !== value) {
+            if (typeof value === 'function') {
+                const attr = name
+                ;
+                props[attr] = el[attr] = value;
+            } else if (!(name in attrs)) {
+                el[name] = value;
+            }
+        }
+    }
+    for(const name1 in attrs){
+        if (!(name1 in next) || next[name1] === false || next[name1] == null) {
+            el.removeAttributeNode(attrs[name1]);
+            delete attrs[name1];
+            continue;
+        }
+        value = next[name1]?.valueOf();
+        switch(name1){
+            case 'style':
+                if (typeof value === 'object') value = toCssText(value);
+                break;
+        }
+        if (props[name1] !== value && typeof value !== 'function') attrs[name1].value = value;
+    }
+    for(const name2 in next){
+        if (!(name2 in attrs) && !(name2 in props)) createProp(doc, el, type, name2, next[name2], attrs);
+    }
+    c.props = next;
+};
+
+const anchor = new Comment();
+const Fragment = Symbol();
+const jsx$1 = (kind, props, key)=>kind === Fragment ? props.children : {
+        kind,
+        props,
+        key
+    }
+;
+const jsxs = jsx$1;
+let hook;
+const createHook = ()=>function current(fn = current.fn) {
+        const prev = hook;
+        hook = current;
+        hook.fn = fn;
+        fn();
+        hook = prev;
+    }
+;
+let Chunk = class Chunk extends Array {
+    firstChild;
+    dom = [];
+    get last() {
+        return this.dom.at(-1);
+    }
+    get nextSibling() {
+        return this.last?.nextSibling;
+    }
+    appendChild(x) {
+        this.push(x);
+    }
+    after(x) {
+        this.last?.after(x);
+    }
+    save() {
+        this.dom = [
+            ...this
+        ];
+    }
+    remove() {
+        this.dom.forEach((el)=>el.remove()
+        );
+        this.splice(0);
+    }
+    removeChild(x) {
+        const i = this.indexOf(x);
+        ~i && this.splice(i, 1);
+    }
+};
+const { TEXT_NODE , COMMENT_NODE  } = document;
+const html = document.createElement.bind(document);
+const svg = document.createElementNS.bind(document, 'http://www.w3.org/2000/svg');
+const forceArray = (x, withNull)=>Array.isArray(x) ? withNull && !x.length ? [
+        null
+    ] : x : x == null && !withNull ? [] : [
+        x
+    ]
+;
+const flatDom = (arr, res = [])=>{
+    for (const el of arr){
+        if (el.dom) res.push(...flatDom(el.dom));
+        else res.push(el);
+    }
+    return res;
+};
+const prevs = new WeakMap();
+const render = (n, el, doc = html, withNull = false)=>reconcile(el, forceArray(n, withNull), prevs.get(el), doc)
+;
+const reconcile = (parent, nk, pk, doc)=>{
+    if (pk?.running) {
+        console.warn('attempt to reconcile lane which is reconciling');
+        return;
+    }
+    if (pk === nk) nk = [
+        ...nk
+    ];
+    prevs.set(parent, nk);
+    nk.running = true;
+    nk.dom = Array(nk.length);
+    nk.keyed = new Map();
+    nk.mapped = new Map();
+    if (Array.isArray(pk)) {
+        const keep = new Set();
+        for(let i = 0, n, el, p, pel, k, pi; i < nk.length; i++){
+            n = nk[pi = i];
+            k = n?.key;
+            if (k != null) {
+                nk.keyed.set(k, i);
+                pi = pk.keyed.get(k) ?? -1;
+            }
+            p = pk[pi];
+            pel = pk.dom[pi];
+            nk.dom[i] = el = create$1(doc, n, p, pel);
+            if (el === pel) keep.add(pel);
+        }
+        for (const pel1 of pk.dom){
+            if (!keep.has(pel1)) {
+                if (parent instanceof Chunk) parent.removeChild(pel1);
+                pel1.remove();
+                pk.mapped.get(pel1)?.hook?.onremove?.();
+            }
+        }
+    } else {
+        for(let i = 0, n, el, k; i < nk.length; i++){
+            n = nk[i];
+            k = n?.key;
+            if (k != null) nk.keyed.set(k, i);
+            nk.dom[i] = el = create$1(doc, n);
+            nk.mapped.set(el, n);
+        }
+    }
+    nk.flatDom = flatDom(nk.dom);
+    if (pk?.flatDom) diff(parent, nk.flatDom, pk.flatDom);
+    else nk.flatDom.forEach((el)=>parent.appendChild(el)
+    );
+    nk.running = false;
+};
+const diff = (parent, n, p, i = 0, len = n.length, el, last)=>{
+    if (parent instanceof Chunk) {
+        for(; i < len; i++){
+            el = n[i];
+            if (i < parent.length) {
+                if (p[i] === el) continue;
+                parent[i] = el;
+            } else {
+                parent.push(el);
+            }
+        }
+        let d = parent.length - len;
+        while(d--)parent.pop();
+    } else {
+        for(; i < len; i++){
+            el = n[i];
+            if (p[i] === el) last = el;
+            else if (!i) parent.insertBefore(last = el, parent.firstChild);
+            else last.after(last = el);
+        }
+    }
+};
+const create$1 = (doc, n, p, pel)=>{
+    let el;
+    switch(typeof n){
+        case 'string':
+        case 'number':
+            if (pel?.nodeType === TEXT_NODE) {
+                if (p != n) pel.nodeValue = n;
+                return pel;
+            }
+            el = new Text(n);
+            return el;
+        case 'object':
+            if (!n) break;
+            if (Array.isArray(n)) {
+                if (pel && Array.isArray(p)) el = pel;
+                else el = new Chunk();
+                reconcile(el, n, p, doc);
+                el.save();
+            } else if (typeof n.kind === 'string') {
+                if (n.kind === 'svg') doc = svg;
+                if (n.props.ref?.current && n.props.ref.current.tagName.toLowerCase() === n.kind && (el = n.props.ref.current) ||
+                pel && p?.kind === n.kind && (el = pel)) {
+                    updateProps(doc, el, n.kind, n.props);
+                } else {
+                    el = doc(n.kind, 'is' in n.props ? {
+                        is: n.props.is
+                    } : void 0);
+                    createProps(doc, el, n.kind, n.props);
+                }
+                if (n.kind === 'foreignObject') doc = html;
+                render(n.props.children, el, doc);
+                if ('ref' in n.props && el !== n.props.ref.current) queueMicrotask(()=>n.props.ref.current = el
+                );
+            } else {
+                let initial = true;
+                if (!((el = pel) && (n.hook = p.hook))) {
+                    el = new Chunk();
+                    n.hook = createHook();
+                }
+                let prevDom;
+                let nextDom;
+                n.hook(()=>{
+                    let next;
+                    if (!initial && !(next = el.nextSibling)) el.after(next = anchor);
+                    render(n.kind(n.props), el, doc, true);
+                    el.save();
+                    if (!initial && next) {
+                        nextDom = flatDom(el);
+                        if (prevDom?.length > 0) {
+                            for(let i = 0, e; i < nextDom.length; i++){
+                                e = nextDom[i];
+                                if (prevDom[i] !== e) next.before(e);
+                            }
+                        } else {
+                            for (const e of nextDom)next.before(e);
+                        }
+                        prevDom = nextDom;
+                        next === anchor && next.remove();
+                    } else {
+                        initial = false;
+                    }
+                });
+            }
+            return el;
+    }
+    if (pel?.nodeType === COMMENT_NODE) return pel;
+    el = new Comment();
+    return el;
+};
+
+/** @jsxImportSource mixter/jsx */
+const Inset = ({ id, dx, dy, blur, color }) => (jsxs("filter", { id: id, x: "-20%", y: "-20%", width: "140%", height: "140%", children: [jsx$1("feOffset", { dx: dx, dy: dy }), jsx$1("feGaussianBlur", { stdDeviation: blur, result: "offset-blur" }), jsx$1("feComposite", { operator: "out", in: "SourceGraphic", in2: "offset-blur", result: "inverse" }), jsx$1("feFlood", { "flood-color": color, "flood-opacity": "1", result: "color" }), jsx$1("feComposite", { operator: "in", in: "color", in2: "inverse", result: "shadow" }), jsx$1("feComposite", { operator: "over", in: "shadow", in2: "SourceGraphic" })] }));
+/* https://www.smashingmagazine.com/2015/05/why-the-svg-filter-is-awesome/#lighting-effect */
+const Shine = ({ id, x, y, z, con, exp, scale, color, blur }) => (jsxs("filter", { id: id, children: [jsx$1("feGaussianBlur", { stdDeviation: blur, in: "SourceAlpha", result: "blur" }), jsx$1("feSpecularLighting", { surfaceScale: scale, specularConstant: con, specularExponent: exp, "lighting-color": color, in: "blur", result: "specular", children: jsx$1("fePointLight", { x: x, y: y, z: z }) }), jsx$1("feComposite", { operator: "in", in: "specular", in2: "SourceAlpha", result: "composite" }), jsxs("feMerge", { children: [jsx$1("feMergeNode", { in: "SourceGraphic" }), jsx$1("feMergeNode", { in: "composite" })] })] }));
+
+const themes = {
+    ableton: {
+        css: /*css*/ `
+      [part=line] {
+        stroke:var(--white)
+      }
+      [part=fill] {
+        stroke:none
+      }`,
+        gap: 37,
+        fill: {
+            radius: 30,
+            size: 3,
+            gap: 6,
+        },
+        circle: 39,
+        line: {
+            size: 29.5,
+            pos: 20.5,
+            width: 3.5,
+        },
+    },
+    retro: {
+        css: /*css*/ `
+      [part=arrow] {
+        fill:var(--white)
+      }
+      [part=rotary] {
+        filter: drop-shadow(2px 2px 1px #0005);
+      }
+      [part=leds-value] {
+        stroke-width: 1px;
+        stroke:var(--white)
+      }`,
+        filters: {
+            rotaryKnob: [
+                {
+                    Filter: Inset,
+                    dx: 7.5,
+                    dy: 7.5,
+                    blur: 7.5,
+                    color: 'rgba(200,200,200,0.05)',
+                },
+            ],
+        },
+        cone: {
+            radius: 33,
+            rays: 11,
+            shine: 0.14,
+            contrast: 1.72,
+        },
+        gap: 91,
+        marks: {
+            count: 13,
+            radius: 41,
+            big: 5,
+            small: 2,
+        },
+        leds: {
+            count: 56,
+            size: 3.5,
+            radius: 34,
+        },
+        disc: {
+            behind: false,
+            radius: 24,
+            rays: 3,
+            count: 81,
+        },
+        fill: {
+            radius: 35,
+            size: -1,
+            gap: 0,
+        },
+        circle: -1,
+        arrow: {
+            size: 9,
+            pos: 19.4,
+            width: 6.5,
+        },
+        line: {
+            size: 0,
+            pos: 25,
+            width: 6.5,
+        },
+        minMax: {
+            size: 11,
+            pos: 1,
+            space: -4,
+        },
+    },
+    metallic: {
+        css: /*css*/ `
+      [part=dot] {
+        fill: var(--black);
+      }
+      [part=leds-value] {
+        stroke:var(--white);
+        stroke-width: 1px;
+      }`,
+        gap: 91,
+        marks: {
+            count: 13,
+            radius: 37.5,
+            big: 5,
+            small: 0,
+        },
+        dot: {
+            pos: 30,
+            size: 2,
+        },
+        leds: {
+            count: 31,
+            size: 5,
+            radius: 30,
+        },
+        disc: {
+            behind: true,
+            radius: 26,
+            rays: 5,
+            count: 131,
+        },
+        fill: {
+            radius: 37,
+            size: -1,
+            gap: 0,
+        },
+        circle: 30,
+        line: {
+            size: 0,
+            pos: 25,
+            width: 6.5,
+        },
+        minMax: {
+            size: 10,
+            pos: -5,
+            space: -16,
+        },
+    },
+    sweet: {
+        css: /*css*/ `
+      [part=outline] {
+        display:none
+      }`,
+        gap: 58,
+        marks: {
+            count: 0,
+            radius: 40,
+            big: 7,
+            small: 4,
+        },
+        fill: {
+            radius: 37,
+            size: 3.5,
+            gap: 6,
+        },
+        // cone: {
+        //   radius: 37,
+        //   rays: 30,
+        //   shine: 1.92,
+        //   contrast: 1.1,
+        // },
+        circle: 35.2,
+        line: { size: 20, pos: 25, width: 6.5 },
+        shape: {
+            radius: 47,
+            notches: 15,
+            tension: 1.6,
+            edge: 1.4,
+            gap: 5,
+        },
+        minMax: {
+            size: 11,
+            pos: 4,
+            space: -5,
+        },
+    },
+    // dark: {
+    //   gap: 91,
+    //   marks: 45,
+    //   leds: -1,
+    //   disc: -1,
+    //   fill: 3,
+    //   fillGap: 0,
+    //   circle: 30,
+    //   radius: -1,
+    //   arrow: 0,
+    //   arrowPos: 23,
+    //   line: 1,
+    //   linePos: 30,
+    //   lineWidth: 6.5,
+    // },
+    power: {
+        css: /*css*/ `
+      [part=shape] {
+        fill: var(--black)
+      }
+      [part=line] {
+        stroke: #fff;
+      }
+      [part=outline] {
+        stroke-width: 0px;
+      }
+      [part=rotary] {
+        filter: drop-shadow(0.5px 2px 2px #0005);
+      }
+      [part=circle] {
+        stroke: var(--black);
+        fill: var(--black);
+      }`,
+        gap: 100,
+        filters: {
+            rotaryKnob: [
+                {
+                    Filter: Shine,
+                    scale: 7,
+                    blur: 2.5,
+                    color: '#111111',
+                    con: 40,
+                    exp: 200,
+                    x: 50,
+                    y: -60,
+                    z: 150,
+                },
+            ],
+            rotaryLine: [
+                {
+                    Filter: Inset,
+                    dx: 1.2,
+                    dy: 1.35,
+                    blur: 1.1,
+                    color: 'rgba(20,20,20,1.0)',
+                },
+            ],
+        },
+        marks: {
+            count: 5,
+            radius: 40,
+            big: 7,
+            small: 4,
+        },
+        leds: {
+            count: 0,
+            size: 5,
+            radius: 30,
+        },
+        circle: 30,
+        line: {
+            size: 10,
+            pos: 29,
+            width: 2.4,
+        },
+        shape: {
+            radius: 55,
+            notches: 3,
+            tension: 0.9,
+            edge: 4,
+            gap: 10,
+        },
+        fill: {
+            radius: 37,
+            size: 1.5,
+            gap: 6,
+        },
+        minMax: {
+            size: 12,
+            pos: 0,
+            space: -8,
+        },
+    },
+    intense: {
+        css: /*css*/ `
+      [part=shape] {
+        fill: var(--black);
+      }
+      [part=line] {
+        stroke: #fff;
+      }
+      [part=outline] {
+        stroke-width: 0px;
+      }
+      [part=rotary] {
+        filter: drop-shadow(1.15px 3px 1.5px rgba(0,0,0,.28));
+      }
+      [part=circle] {
+        fill: var(--black);
+      }`,
+        filters: {
+            rotaryKnob: [
+                {
+                    Filter: Shine,
+                    scale: 6,
+                    blur: 2.85,
+                    color: '#121212',
+                    con: 25,
+                    exp: 100,
+                    x: 50,
+                    y: -90,
+                    z: 140,
+                },
+            ],
+            rotaryLine: [
+                {
+                    Filter: Inset,
+                    dx: 1.2,
+                    dy: 1.35,
+                    blur: 1.1,
+                    color: 'rgba(20,20,20,1.0)',
+                },
+            ],
+        },
+        gap: 119,
+        marks: {
+            count: 27,
+            radius: 34,
+            big: 10,
+            small: 6,
+        },
+        leds: {
+            count: 0,
+            size: 5,
+            radius: 30,
+        },
+        circle: -1,
+        line: {
+            size: 8,
+            pos: 27,
+            width: 2.1,
+        },
+        shape: {
+            radius: 53,
+            notches: 2,
+            tension: 2.05,
+            edge: 2.1,
+            gap: 2,
+        },
+        fill: {
+            radius: 35,
+            size: 2,
+            gap: 6,
+        },
+        minMax: {
+            size: 12,
+            pos: 0,
+            space: -8,
+        },
+    },
+    amp: {
+        css: /*css*/ `
+      [part=shape] {
+        fill: var(--black);
+      }
+      [part=line] {
+        stroke: #fff;
+      }
+      [part=outline] {
+        stroke-width: 0px;
+      }
+      [part=rotary] {
+        filter: drop-shadow(1.15px 3px 1.5px rgba(0,0,0,.28));
+      }
+      [part=circle] {
+        fill: var(--black);
+      }`,
+        filters: {
+            rotaryKnob: [
+                {
+                    Filter: Shine,
+                    scale: 6,
+                    blur: 2.85,
+                    color: '#121212',
+                    con: 25,
+                    exp: 100,
+                    x: 50,
+                    y: -90,
+                    z: 140,
+                },
+            ],
+            rotaryLine: [
+                {
+                    Filter: Inset,
+                    dx: 1.2,
+                    dy: 1.35,
+                    blur: 1.1,
+                    color: 'rgba(20,20,20,1.0)',
+                },
+            ],
+        },
+        gap: 119,
+        marks: {
+            count: 0,
+            radius: 34,
+            big: 10,
+            small: 6,
+        },
+        leds: {
+            count: 11,
+            size: 7,
+            radius: 33,
+        },
+        circle: -1,
+        line: {
+            size: 8,
+            pos: 27,
+            width: 2.1,
+        },
+        shape: {
+            radius: 53,
+            notches: 5,
+            tension: 1.3,
+            edge: 2.1,
+            gap: 5,
+        },
+        fill: {
+            radius: 0,
+            size: 2,
+            gap: 6,
+        },
+        minMax: {
+            size: 12,
+            pos: 0,
+            space: -8,
+        },
+    },
+    flat: {
+        css: /*css*/ `
+      [part=shape] {
+        fill: var(--black);
+      }
+      [part=arrow] {
+        fill: var(--white)
+      }
+      [part=outline] {
+        stroke-width:1.2px
+      }
+      [part=leds-value] {
+        stroke-width: 1px;
+      }
+      [part=circle] {
+        stroke: var(--light);
+        fill:var(--black);
+      }`,
+        gap: 75,
+        leds: {
+            count: 36,
+            size: 3.8,
+            radius: 34,
+        },
+        circle: 30,
+        arrow: {
+            size: 5.5,
+            pos: 26,
+            width: 3,
+        },
+        // dot: {
+        //   pos: 33,
+        //   size: 1.5,
+        // },
+        minMax: {
+            size: 11,
+            pos: -0.5,
+            space: -10,
+        },
+    },
+    zen: {
+        circle: 40,
+        gap: 0,
+        fill: {
+            radius: 34,
+            size: 2.5,
+            gap: 6,
+        },
+        line: {
+            size: 0,
+            pos: 25,
+            width: 6.5,
+        },
+        dot: {
+            size: 2,
+            pos: 27,
+        },
+        minMax: {
+            size: 0,
+            pos: 10,
+            space: 10,
+        },
+        shape: {
+            radius: 19.905180883293024,
+            notches: 15,
+            tension: 1.6,
+            edge: 1.4,
+            gap: 5,
+        },
+        css: '\n      [part=shape] {\n        fill: var(--black)\n      }\n      [part=line] {\n        stroke: var(--light)\n      }\n      [part=outline] {\n        stroke-width: 0px;\n      }\n      [part=circle] {\n        stroke: var(--black);\n        fill: var(--black);\n      }',
+    },
+    // compass: {
+    //   gap: 0,
+    //   marks: 13,
+    //   leds: 29,
+    //   disc: -1,
+    //   fill: -1,
+    //   fillGap: 6,
+    //   circle: 35,
+    //   radius: -1,
+    //   arrow: 47,
+    //   arrowPos: 24,
+    //   line: 0,
+    //   linePos: 29,
+    //   lineWidth: 6.5,
+    //   shapeNotches: 15,
+    //   shapeTension: 1.6,
+    //   shapeEdge: 1.4,
+    //   shapeGap: 5,
+    //   cone: false,
+    //   symmetric: false,
+    //   minMaxY: -1,
+    // },
+    // gauge: {
+    //   gap: 180,
+    //   marks: 9,
+    //   leds: 8,
+    //   disc: -1,
+    //   fill: 2,
+    //   fillGap: 6,
+    //   circle: -1,
+    //   radius: 30,
+    //   arrow: 40.5,
+    //   arrowPos: 10.5,
+    //   line: 0,
+    //   linePos: 25,
+    //   lineWidth: 6.5,
+    //   shapeNotches: 7,
+    //   shapeTension: 1,
+    //   shapeEdge: 1.3,
+    //   shapeGap: 0.75,
+    //   cone: false,
+    //   symmetric: false,
+    //   minMaxY: 75,
+    // },
+};
+
+const FluentFlags = (cb, flags = {})=>new Proxy(cb, {
+        get (_, prop, receiver) {
+            flags[prop] = true;
+            return receiver;
+        },
+        apply (_, self, args) {
+            const f = {
+                ...flags
+            };
+            flags = {}
+            ;
+            return cb.call(self, f).apply(self, args);
+        }
+    })
+;
+
+const event = ()=>FluentFlags((flags)=>(fn = ()=>{})=>function(event1) {
+                if (flags.prevent) event1.preventDefault();
+                if (flags.stop) flags.immediate ? event1.stopImmediatePropagation() : event1.stopPropagation();
+                return fn.call(this, event1);
+            }
+    )
+;
+
+function onEvent(el, type, listener, options) {
+    el.addEventListener(type, listener, options);
+    return ()=>off(el, type, listener, options)
+    ;
+}
+ const on = ()=>FluentFlags((flags)=>(el, type, fn, options = {})=>onEvent(el, type, fn, {
+                ...flags.active ? {
+                    passive: false
+                } : null,
+                ...flags,
+                ...options
+            })
+    )
+;
+ const off = (el, type, listener, options)=>el.removeEventListener(type, listener, options)
+;
+
+const q = (queueFn)=>(fn)=>{
+        let self;
+        let args;
+        let next;
+        const cb = ()=>{
+            if (next) queueFn(cb);
+            fn.apply(self, args);
+            args = next ?? null;
+            next = null;
+        };
+        return function(...newArgs) {
+            self = this;
+            if (!args) {
+                queueFn(cb);
+                args = newArgs;
+            } else {
+                next = newArgs;
+            }
+        };
+    }
+;
+ const queue = ()=>({
+ raf: q(requestAnimationFrame),
+ time: q(setTimeout),
+ task: q(queueMicrotask)
+    })
+;
+
+const accessors = (target, source, fn)=>Object.defineProperties(target, Object.fromEntries(Object.entries(source).map(([key, value])=>{
+        const next = fn(key, value);
+        const prev = Object.getOwnPropertyDescriptor(target, key);
+        if (prev && prev.get && prev.set) {
+            const { get , set  } = next;
+            next.get = ()=>prev.get?.() ?? get()
+            ;
+            next.set = (v)=>{
+                prev.set?.(v);
+                set(prev.get?.() ?? v);
+            };
+        }
+        return [
+            key,
+            {
+                configurable: true,
+                enumerable: true,
+                ...next
+            }
+        ];
+    })))
+;
+
+const Types = new Map([
+    [
+        String,
+        (x)=>x.toString()
+    ],
+    [
+        Number,
+        (x)=>parseFloat(x)
+    ],
+    [
+        Boolean,
+        (x)=>x = x === false ? false : x != null
+    ],
+]);
+const applyProps = (self, data)=>{
+    for (const [key1, value1] of Object.entries(data))if ([
+        String,
+        Number,
+        Boolean
+    ].includes(value1)) data[key1] = void 0;
+    accessors(self, data, (key)=>{
+        const attr = key.toLowerCase();
+        return {
+            get: ()=>data[key]
+            ,
+            set (value) {
+                self.setAttribute(attr, value);
+            }
+        };
+    });
+    return data;
+};
+const attrs = (attrs1)=>(superclass)=>{
+        const types = new Map();
+        const map = new Map();
+        for (const [key2, value] of Object.entries(new attrs1())){
+            const type = value == null ? Types.get(String) : Types.get(value) ?? Types.get(value?.constructor);
+            if (!type) {
+                throw new TypeError(`Attribute "${key2}" is not valid type, must be either: String, Number, Boolean, null, undefined`);
+            }
+            types.set(key2, type);
+            map.set(key2.toLowerCase(), key2);
+        }
+        const observedAttributes = [
+            ...map.keys()
+        ];
+        return class extends superclass {
+            static get observedAttributes() {
+                return observedAttributes.concat(super.observedAttributes ?? []);
+            }
+            #data;
+            constructor(...args){
+                super(...args);
+                this.#data = applyProps(this, new attrs1());
+            }
+            attributeChangedCallback(name, oldValue, newValue) {
+                let key;
+                if (key = map.get(name)) {
+                    const prev = this.#data[key];
+                    const next = types.get(key)(newValue);
+                    if (!Object.is(prev, next)) {
+                        this.#data[key] = next;
+                        this.propertyChangedCallback?.(key, prev, next);
+                    }
+                }
+                super.attributeChangedCallback?.(name, oldValue, newValue);
+            }
+        };
+    }
+;
+
+const Listener = (body)=>new Function('event', `with(this){let fn=${body};return typeof fn=='function'?fn.call(this,event):fn}`)
+;
+const events = ()=>(superclass)=>superclass.prototype.dispatch
+         ? superclass : class extends superclass {
+            dispatchEvent(event) {
+                const onEvent = `on${event.type}`;
+                let fn = this[onEvent];
+                if (!fn) fn = Listener(this.getAttribute(onEvent));
+                const pass = fn.call(this, event);
+                if (pass !== false) super.dispatchEvent(event);
+                return pass;
+            }
+            dispatch(name, detail, init) {
+                return this.dispatchEvent(new CustomEvent(name, {
+                    detail,
+                    ...init
+                }));
+            }
+        }
+;
+
+const lifecycle = ()=>(superclass)=>class extends mixter(superclass, events()) {
+            isMounted = false;
+            connectedCallback() {
+                super.connectedCallback?.();
+                if (!this.isMounted) {
+                    this.isMounted = true;
+                    this.dispatch('mounted');
+                }
+            }
+            disconnectedCallback() {
+                super.disconnectedCallback?.();
+                queueMicrotask(()=>{
+                    if (!this.isConnected) {
+                        this.isMounted = false;
+                        this.dispatch('unmounted');
+                    }
+                });
+            }
+        }
+;
+
+const props = (props1)=>(superclass)=>class extends superclass {
+            constructor(...args){
+                super(...args);
+                Object.assign(this, new props1());
+            }
+        }
+;
+
+const shadow = (init = '', html = '')=>(superclass)=>class extends superclass {
+            root = (()=>{
+                const root = this.attachShadow(typeof init === 'object' ? init : {
+                    mode: 'open'
+                });
+                root.innerHTML = typeof init === 'string' ? init : html;
+                return root;
+            })();
+        }
+;
+
+const argsOf = (x1)=>{
+    const d = x1.indexOf('{') + 1;
+    if (!d || x1.slice(0, d).includes(')')) return [];
+    x1 = x1.slice(d);
+    let match;
+    do {
+        match = false;
+        x1 = x1.replace(/`((\\`)?[^`])+?`|'((\\')?[^'])+?'|"((\\")?[^"])+?"|\([^{[(]*?\)|\{[^{[(]*?\}|\[[^{[(]*?\]/g, ()=>{
+            match = true;
+            return '';
+        });
+    }while (match)
+    return x1.split('}')[0].split(',').map((x)=>x.split(/[^\w\s$]+/g)[0].trim()
+    );
+};
+ const argtor = (fn, keys = new Set())=>(argsOf('' + fn).forEach((x)=>!x || keys.add(x)
+    ), keys)
+;
+
+const create = (target)=>{
+    const NO_DEPS = Symbol();
+    const REDUCER = Symbol();
+    const entries = Object.entries(target);
+    const mem = Object.fromEntries(entries);
+    const register = (f)=>{
+        f.keys = argtor(f.fn);
+        f.keys.forEach((key)=>effects.get(key).push(f)
+        );
+        !f.keys.size && effects.get(NO_DEPS).push(f);
+        f.values = {};
+        return run(f);
+    };
+    const update = (f)=>{
+        f.pass = !f.keys.size;
+        for (const key of f.keys){
+            const value = target[key];
+            if (value == null) {
+                f.pass = false;
+                return;
+            }
+            if (!Object.is(f.values[key], value)) {
+                f.values[key] = value;
+                f.pass = true;
+            }
+        }
+    };
+    const run = (f)=>{
+        update(f);
+        f.dispose?.();
+        if (!f.pass) return;
+        const result = f.fn(f.values);
+        if (f.cb?.(result) === false) return;
+        if (f.target != null) {
+            target[f.target] = result;
+            return true;
+        } else {
+            if (typeof result === 'function') {
+                f.dispose = ()=>{
+                    result();
+                    f.dispose = null;
+                };
+            }
+        }
+    };
+    const context = {
+        $: {}
+    };
+    const $ = context.$;
+    $.$ = $;
+    accessors(context.$, target, (key)=>({
+            get: ()=>mem[key]
+            ,
+            set (v) {
+                if (v === REDUCER) {
+                    v = reducer.initial;
+                    reducer.target = key;
+                    if (register(reducer)) return;
+                    if (v == null) return;
+                }
+                target[key] = v;
+            }
+        })
+    );
+    accessors(target, target, (key)=>({
+            get: ()=>mem[key]
+            ,
+            set (v) {
+                if (!Object.is(mem[key], v)) {
+                    mem[key] = v;
+                    effects.get(key).forEach(run);
+                }
+            }
+        })
+    );
+    let reducer;
+    $.reduce = (fn, initial)=>{
+        reducer = {
+            fn,
+            initial
+        };
+        return REDUCER;
+    };
+    $.effect = (fn, cb)=>register({
+            fn,
+            cb
+        })
+    ;
+    let effects;
+    $.cleanup = ()=>{
+        if (effects) {
+            for (const fns of effects.values())fns.forEach((f)=>f.dispose?.()
+            );
+        }
+        effects = new Map([
+            [
+                NO_DEPS,
+                []
+            ],
+            ...entries.map(([key])=>[
+                    key,
+                    []
+                ]
+            ),
+        ]);
+    };
+    $.cleanup();
+    return $;
+};
+const state = (fn)=>(superclass)=>class extends mixter(superclass, lifecycle()) {
+            host = this;
+            constructor(...args){
+                super(...args);
+                const context = create(this);
+                on()(this, 'mounted', ()=>fn.call(this, context)
+                );
+                on()(this, 'unmounted', context.cleanup);
+            }
+        }
+;
+
+function mixter(a, ...mixins) {
+    return mixins.reduce((c, mixin)=>mixin(c)
+    , a);
+}
+
+const renderer = (render)=>($)=>({
+            render (fn) {
+                $.effect(fn, (result)=>{
+                    render(result, $.root);
+                    return false;
+                });
+            }
+        })
+;
+
+const jsx = ($)=>({
+        ...renderer(render)($),
+        part (fn, output) {
+            let update;
+            const cb = (value)=>{
+                output = value;
+                update?.();
+                return false;
+            };
+            const Fn = ()=>{
+                if (!update) $.effect(fn, cb);
+                update = hook;
+                return output;
+            };
+            return Fn;
+        }
+    })
+;
+
+const getElementOffset = (el)=>{
+    let x = 0;
+    let y = 0;
+    do {
+        x += el.offsetLeft - el.scrollLeft;
+        y += el.offsetTop - el.scrollTop;
+    }while (el = el.offsetParent)
+    return {
+        x,
+        y
+    };
+};
+
+const getRelativeMouseFromEvent = (el, event)=>getRelativeMouse(el, {
+        x: event.pageX,
+        y: event.pageY
+    })
+;
+const getRelativeMouse = (el, pos)=>{
+    let x = 0;
+    let y = 0;
+    const offset = getElementOffset(el);
+    let py = pos.y;
+    if (py > 16384) py -= 32768;
+    x = pos.x - offset.x;
+    y = py - offset.y;
+    return {
+        x,
+        y
+    };
+};
+
+/** @jsxImportSource mixter/jsx */
+const TextAlignCenter = ({ fontSize, width, x, y, children }) => (jsxs("g", { transform: `translate(${x},${y})`, children: [jsx$1("rect", { width: width, height: "0", fill: "transparent" }), jsx$1("text", { x: width / 2, y: "0", "text-anchor": "middle", "font-size": fontSize || 'var(--font-size)', "alignment-baseline": "middle", children: children })] }));
+const Style = ({ lineWidth, fill, disc, css }) => /*css*/ `
+:host {
+  --font-size: 20;
+  --white: #fff;
+  --grey: #888;
+  --dark: #666;
+  --light: #aaa;
+  --black: #151515;
+  --cone-hue: 0;
+  --cone-sat: 0%;
+  font-family: sans-serif;
+  position: relative;
+  touch-action: none;
+  display: inline-flex;
+  align-items: center;
+  flex-flow: column nowrap;
+  justify-content: space-around;
+  user-select: none;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+/* [part=slot] {
+  display: flex;
+  place-items: center;
+  flex-flow: column nowrap;
+  width: 100%;
+}
+ */
+[part=svg] {
+  width: 100%;
+  height: 100%;
+  user-select: none;
+  overflow: hidden;
+}
+
+[part=viewbox] {
+  display: contents;
+  overflow: hidden;
+}
+
+[part=circle] {
+  fill: var(--black);
+}
+
+[part=arrow] {
+  fill: var(--black);
+}
+
+[part=line] {
+  stroke: var(--black);
+  stroke-width: ${lineWidth}px;
+  stroke-linejoin: round;
+}
+
+[part=dot] {
+  fill: var(--white);
+}
+
+[part=outline] {
+  fill: none;
+  stroke: var(--light);
+  stroke-width: 1px;
+}
+
+[part=fill] {
+  fill: none;
+  stroke: var(--dark);
+  stroke-width: ${fill || 5}px;
+}
+
+[part=fill-value] {
+  fill: none;
+  stroke: var(--white);
+  stroke-width: ${fill || 5}px;
+}
+
+[part=cone] {
+  stroke: var(--grey);
+}
+
+[part=marks] {
+  stroke: var(--dark);
+  stroke-width: 1px;
+}
+
+[part=leds] {
+  fill: var(--dark);
+  stroke: var(--dark);
+}
+
+[part=leds-value] {
+  fill: var(--black);
+  stroke: var(--white);
+  stroke-width: 2px;
+}
+
+[part=outline] {
+  fill: var(--black);
+  stroke: var(--grey);
+  stroke-width: 1px;
+}
+
+[part=shape] {
+  fill: var(--white);
+}
+
+[part=disc] {
+  display: contents;
+  box-sizing: border-box;
+  background: var(--grey);
+  box-shadow:
+    inset 4px 4px 8px -2px var(--white),
+    inset -4px -4px 8px -2px var(--dark);
+  width: ${disc.radius}%;
+  height: ${disc.radius}%;
+  border-radius: 100%;
+  z-index: 1;
+}
+
+[part=minmax] {
+  fill: var(--dark);
+}
+
+* {
+  transform-origin: 50% 50%;
+}
+
+${css ?? ''}`;
+
+const memoize = (fn, map = Object.create(null)) => {
+    const wrapped = function (...args) {
+        const serialized = args.join();
+        return map[serialized] ?? (map[serialized] = fn.apply(this, args));
+    };
+    return wrapped;
+};
+
+class Vec extends Array {
+    get x() {
+        return this[0];
+    }
+    get y() {
+        return this[1];
+    }
+    toString() {
+        return this[0] + ' ' + this[1];
+    }
+}
+const vec = (x, y) => new Vec(x, y);
+const cos = memoize(Math.cos);
+const sin = memoize(Math.sin);
+const trig = memoize((a, radius = 1) => vec(cos(a) * radius, sin(a) * radius));
+const rads = memoize((deg) => (Math.PI * deg) / 180);
+const drawLeds = memoize((normal, count, radius, size, gap, symmetric = false, inverse = false) => {
+    const circle = Math.PI * 2 - rads(gap);
+    const step = circle / (count - 1);
+    const amount = (count - 1) * normal;
+    const half = count / 2;
+    const offset = Math.PI / 2;
+    const path = ['M 50 50'];
+    for (let n = 0, a = offset + rads(gap / 2); n < count; n++, a += step) {
+        if (+(symmetric
+            ? normal < 0.5
+                ? n >= half - (half - amount) && n < half // 0..0.5
+                : normal > 0.5
+                    ? n <= count - (count - amount) && n >= half - 0.9 // 0.5..1
+                    : false
+            : n < amount
+                + +(n >= count / 2) * 0.01 // this because otherwise never reaches 100%, after .5 we push a little
+        )
+            ^ +!inverse) { // finally XOR condition on inverse
+            path.push(`M 50 50 m ${trig(a, radius)} l ${trig(a, size)}`);
+        }
+    }
+    path.push('z');
+    return path.join(' ');
+});
+const drawMarks = memoize((count, radius, big, small, gap, skip = false) => {
+    count += skip ? 2 : 0;
+    const offset = Math.PI / 2;
+    const circle = Math.PI * 2 - rads(gap);
+    const step = circle / (count - 1);
+    const marks = [90, 180, 270, 135, 225, 45, 315, 0].map(x => (offset + rads(x)).toPrecision(2));
+    const path = ['M 50 50'];
+    let i = 0;
+    for (let n = skip ? 1 : 0, a = offset + rads(gap / 2) + (skip ? step : 0); n < count - (skip ? 1 : 0); n++, i++, a += step) {
+        const length = i === 0 || n === (count - 1) / 2 || (n + 1 >= count - (skip
+            ? 1
+            : 0))
+            || marks.includes(a.toPrecision(2))
+            ? big
+            : small;
+        path.push(`M 50 50 m ${trig(a, radius)} l ${trig(a, length)}`);
+    }
+    path.push('z');
+    return path.join(' ');
+});
+const drawRays = memoize((count = 8, radius = 28) => {
+    const r = [];
+    for (let i = 0; i <= Math.PI * 2; i += Math.PI / count)
+        r.push(trig(i));
+    const path = ['M 50 50'];
+    for (let i = 0; i < r.length; i++) {
+        const [ax, bx] = [r[i].x, r[(i + 1) % r.length].x];
+        const [ay, by] = [r[i].y, r[(i + 1) % r.length].y];
+        path.push(`M 50 50 L
+      ${50 + ax * radius} ${50 + ay * radius}
+      ${50 + bx * radius} ${50 + by * radius}
+    `);
+    }
+    return path;
+});
+const drawFill = memoize((normal, radius, notch, gap, symmetric = false, inverse = false) => {
+    const offset = 90;
+    const circle = 360 - gap;
+    const half = circle / 2;
+    const start = gap / 2 + offset;
+    const end = 360 - gap / 2 + offset;
+    const middle = start + half;
+    const center = [50, 50];
+    if (symmetric) {
+        if (normal >= 0.5) {
+            const sc = middle + notch;
+            if (inverse) {
+                const ec = middle + half * (normal - 0.5) * 2;
+                return ec - sc > 0 ? arc(...center, radius, sc, ec) : '';
+            }
+            else {
+                const ec = end;
+                return `${arc(...center, radius, start, middle - notch)} ${arc(...center, radius, sc, ec)}`;
+            }
+        }
+        else {
+            if (inverse) {
+                const sc = middle - ((circle - notch) / 2) * (0.5 - normal) * 2;
+                const ec = middle - notch; //
+                return ec - sc > 0 ? arc(...center, radius, sc - notch / 2, ec) : '';
+            }
+            else {
+                const sc = start + notch;
+                const ec = Math.min(middle - notch * 2, middle - half * (0.5 - normal) * 2);
+                return `${arc(...center, radius, middle + notch, end)} ${arc(...center, radius, sc - notch, ec + notch)}`;
+            }
+        }
+    }
+    else {
+        return inverse
+            ? arc(...center, radius, start + 0.00001, start + circle * normal * 0.999999)
+            : arc(...center, radius, start + 0.00001 + circle * normal * 0.999999, end);
+    }
+});
+const polarToCartesian = memoize((centerX, centerY, radius, deg) => {
+    const a = rads(deg);
+    return vec(centerX + radius * cos(a), centerY + radius * sin(a));
+});
+const arc = memoize((x, y, radius, startAngle, endAngle) => {
+    const start = polarToCartesian(x, y, radius, endAngle);
+    const end = polarToCartesian(x, y, radius, startAngle);
+    const large = endAngle - startAngle <= 180 ? '0' : '1';
+    const d = ['M', start.x, start.y, 'A', radius, radius, 0, large, 0, end.x, end.y].join(' ');
+    return d;
+});
+const drawShape = memoize((count, radius, tension = 2, edge = 3, gap = 5) => {
+    count = count * 3; // ?????
+    const slice = (Math.PI * 2) / count;
+    const start = -Math.PI;
+    const center = vec(50, 50);
+    const points = [];
+    for (let i = 0; i < count; i++) {
+        const pos = i * slice;
+        const a = start + pos;
+        const point = vec(center.x + cos(a) * radius - Math.tanh(cos(pos) * (i % gap ? 1 : -1)) * edge, center.y + sin(a) * radius - Math.tanh(sin(pos) * (i % gap ? 1 : -1)) * edge);
+        points.push(point);
+    }
+    return cardinal(points, true, tension);
+});
+// Cardinal spline - a uniform Catmull-Rom spline with a tension option
+const cardinal = (data, closed, tension) => {
+    if (data.length < 1)
+        return 'M 0 0';
+    if (tension == null)
+        tension = 1;
+    const size = data.length - (closed ? 0 : 1);
+    const path = [`M ${data[0]} C`];
+    for (let i = 0; i < size; i++) {
+        let p0, p1, p2, p3;
+        if (closed) {
+            p0 = data[(i - 1 + size) % size];
+            p1 = data[i];
+            p2 = data[(i + 1) % size];
+            p3 = data[(i + 2) % size];
+        }
+        else {
+            p0 = i == 0 ? data[0] : data[i - 1];
+            p1 = data[i];
+            p2 = data[i + 1];
+            p3 = i == size - 1 ? p2 : data[i + 2];
+        }
+        const x1 = p1.x + ((p2.x - p0.x) / 6) * tension;
+        const y1 = p1.y + ((p2.y - p0.y) / 6) * tension;
+        const x2 = p2.x - ((p3.x - p1.x) / 6) * tension;
+        const y2 = p2.y - ((p3.y - p1.y) / 6) * tension;
+        path.push(x1, y1, x2, y2, p2.x, p2.y);
+    }
+    closed && path.push('z');
+    return path.join(' ');
+};
+
+class KnobElement extends mixter(HTMLElement, shadow(), attrs(class {
+    theme = '';
+    css = '';
+    value = 0;
+    min = 0;
+    max = 100;
+    step = 1;
+    symmetric = false;
+    circle = -1;
+    gap = 30;
+}), props(class {
+    filters = {
+        rotary: [],
+        rotaryLine: [],
+    };
+    cone = {
+        radius: 28,
+        rays: 0,
+        shine: 1.2,
+        contrast: 1.38,
+    };
+    disc = {
+        behind: false,
+        radius: 0,
+        rays: 5,
+        count: 131,
+    };
+    leds = {
+        count: 0,
+        size: 5,
+        radius: 30,
+    };
+    marks = {
+        count: 0,
+        radius: 40,
+        big: 7,
+        small: 4,
+    };
+    arrow = {
+        size: 0,
+        pos: 23,
+        width: 5,
+    };
+    fill = {
+        radius: 37,
+        size: -1,
+        gap: 6,
+    };
+    line = {
+        size: 0,
+        pos: 25,
+        width: 6.5,
+    };
+    dot = {
+        size: 0,
+        pos: 25,
+    };
+    minMax = {
+        size: 0,
+        pos: 10,
+        space: 10,
+    };
+    shape = {
+        radius: 0,
+        notches: 15,
+        tension: 1.6,
+        edge: 1.4,
+        gap: 5,
+    };
+    scale = 1;
+    normal = 0;
+    target;
+    vel = 0;
+    degrees = 0;
+    pointer = {
+        id: -1,
+        x: 0,
+        y: 0,
+    };
+    pointerDown = false;
+    start = {
+        y: -1,
+        value: 0,
+    };
+    resetStart;
+    updatePointer;
+    onPointerMove;
+    onPointerDown;
+    onWheel;
+}), state(({ $, effect, reduce }) => {
+    const { part, render } = jsx($);
+    effect(({ host, theme }) => {
+        if (theme)
+            Object.assign(host, themes[theme]);
+    });
+    $.scale = reduce(({ min, max }) => {
+        // this guard is the case where attribute 'min' arrives before 'max'
+        // and there are operations that rely on 'max - min' (scale) being >0
+        if (max - min <= 0)
+            $.max = min + 1;
+        return max - min;
+    });
+    $.target = reduce(({ target, min, max }) => Math.max(min, Math.min(max, target)));
+    $.value = reduce(({ value, min, max }) => Math.max(min, Math.min(max, value)));
+    effect(({ value }) => {
+        if ($.target == null)
+            $.target = value;
+    });
+    $.normal = reduce(({ value, min, scale }) => (value - min) / scale);
+    $.degrees = reduce(({ normal, gap }) => {
+        const start = gap / 2 - 90;
+        const circle = 360 - gap;
+        return normal * circle + start;
+    });
+    effect(({ host, value: _ }) => {
+        host.dispatchEvent(new InputEvent('input'));
+    });
+    $.onPointerMove = reduce(({ host }) => (e => {
+        if (e.pointerId !== $.pointer.id)
+            return;
+        $.pointer = {
+            id: e.pointerId,
+            ...getRelativeMouseFromEvent(host, e),
+        };
+    }));
+    const draw = queue().raf(() => {
+        $.vel *= 0.66;
+        if (Math.abs($.target - $.value) > $.step * 0.15) {
+            $.vel += ($.target - $.value) * 0.064;
+            // if (Math.abs($.vel) > $.step * 14) {
+            //   $.value = $.target
+            //   $.vel = 0
+            //   return
+            // }
+            $.value += $.vel;
+            if (($.vel < 0 && $.target > $.value) || ($.vel > 0 && $.target < $.value)) {
+                $.value = $.target;
+                $.vel = 0;
+            }
+            else {
+                requestAnimationFrame(draw);
+            }
+        }
+        else {
+            $.value = $.target;
+            $.vel = 0;
+        }
+    });
+    effect(({ target: _ }) => {
+        draw();
+    });
+    effect(({ pointerDown, pointer, start, scale }) => {
+        if (!pointerDown)
+            return;
+        $.target = start.value + (start.y - pointer.y) * scale * 0.01;
+    });
+    effect(({ pointerDown, onPointerMove }) => {
+        if (!pointerDown)
+            return;
+        const off = on()(window, 'pointermove', onPointerMove);
+        const offOnce = on().once(window, 'pointerup', () => {
+            $.pointerDown = false;
+            off();
+        });
+        return () => {
+            off();
+            offOnce();
+        };
+    });
+    $.onPointerDown = reduce(({ host }) => (e => {
+        $.pointer = {
+            id: e.pointerId,
+            ...getRelativeMouseFromEvent(host, e),
+        };
+        $.start = {
+            y: $.pointer.y,
+            value: $.value,
+        };
+        $.pointerDown = true;
+    }));
+    $.onWheel = reduce(({ step, scale }) => ((e) => {
+        const mul = e.deltaMode === 1 ? 15 : 1.12;
+        const sign = Math.sign(e.deltaY);
+        const abs = Math.abs(e.deltaY) * mul;
+        $.target += Math.max(step, abs * 0.0005 * scale) * sign * (e.shiftKey ? 0.2 : 1);
+    }));
+    effect(({ host, onWheel }) => on().active(host, 'wheel', event().prevent.stop(onWheel)));
+    const Circle = part(({ circle }) => jsx$1("circle", { part: "circle", cx: "50", cy: "50", r: circle || 36 }));
+    const Fill = part(({ normal, fill, gap, symmetric }) => (jsxs("g", { children: [jsx$1("path", { part: "fill", d: drawFill(normal, fill.radius, fill.gap, gap, symmetric) }), jsx$1("path", { part: "fill-value", d: drawFill(normal, fill.radius, fill.gap, gap, symmetric, true) })] })));
+    const Leds = part(({ normal, leds, gap, symmetric }) => (jsxs("g", { children: [jsx$1("path", { part: "leds", d: drawLeds(normal, leds.count, leds.radius, leds.size, gap, symmetric) }), jsx$1("path", { part: "leds-value", d: drawLeds(normal, leds.count, leds.radius, leds.size, gap, symmetric, true) })] })));
+    const Marks = part(({ marks, gap }) => (jsx$1("g", { children: jsx$1("path", { part: "marks", d: drawMarks(marks.count, marks.radius, marks.big, marks.small, gap) }) })));
+    const Cone = part(({ normal, gap, cone }) => {
+        const cn = (360 - gap) / 360;
+        const { rays, contrast, shine, radius } = cone;
+        return (jsx$1("g", { part: "cone", children: drawRays(rays, radius).map((d, i) => {
+                const r = rays * 2;
+                const half = r / 2;
+                let xi = normal * (r - r * (1 - cn)) + 1.6;
+                xi -= half * cn;
+                while (xi < 0)
+                    xi += r;
+                xi = i + xi;
+                xi %= r;
+                const light = 5 + shine * contrast ** (xi < half ? xi : half - (xi - half));
+                return (jsx$1("path", { d: d, fill: `hsl(var(--cone-hue),var(--cone-sat),${light}%)`, stroke: `hsl(var(--cone-hue),var(--cone-sat),${light}%)` }, i));
+            }) }));
+    });
+    const Shape = part(({ shape }) => (jsxs("g", { children: [jsx$1("defs", { children: jsx$1("clipPath", { id: "shape", children: jsx$1("path", { id: "shape-path", d: drawShape(shape.notches, 25, shape.tension, shape.edge, shape.gap), style: { transform: `scale(${(shape.radius || 50) / 50})` } }) }) }), jsx$1("circle", { part: "shape", "clip-path": "url(#shape)", cx: "50", cy: "50", r: "50" }), jsx$1("use", { part: "outline", href: "#shape-path" })] })));
+    const Line = part(({ line, shape }) => (jsx$1("path", { part: "line", "clip-path": shape.radius > 0 ? 'url(#shape)' : null, d: `M ${line.pos} 50 l ${line.size} 0 z` })));
+    const Dot = part(({ dot }) => jsx$1("circle", { part: "dot", cx: dot.pos, cy: "50", r: dot.size }));
+    const Arrow = part(({ arrow }) => (jsx$1("path", { part: "arrow", d: `M ${arrow.pos} 50 L ${arrow.pos + arrow.size} ${50 - arrow.width} L ${arrow.pos + arrow.size} ${50 + arrow.width} z` })));
+    const RotaryKnob = part(({ filters, degrees, cone, shape }) => {
+        return (jsx$1("g", { part: "rotary-knob-filters", style: { filter: filters.rotaryKnob?.map((_, i) => `url(#rotaryKnob${i})`).join(' ') }, children: jsxs("g", { part: "rotary-knob", style: { transform: `rotate(${degrees}deg)` }, children: [cone.rays && jsx$1(Cone, {}), shape.radius && jsx$1(Shape, {})] }) }));
+    });
+    const RotaryLine = part(({ filters, degrees, dot, line, arrow }) => {
+        return (jsxs("g", { part: "rotary-line-filters", style: { filter: filters.rotaryLine?.map((_, i) => `url(#rotaryLine${i})`).join(' ') }, children: [jsx$1("circle", { r: "5", cx: "0", cy: "0", visibility: "hidden" }), jsxs("g", { part: "rotary-line", style: { transform: `rotate(${degrees}deg)` }, children: [line.size && jsx$1(Line, {}), dot.size && jsx$1(Dot, {}), !!arrow.size && jsx$1(Arrow, {})] })] }));
+    });
+    const Disc = part(({ disc, normal, gap }) => {
+        const cn = (360 - gap) / 360;
+        const { count, radius, rays } = disc;
+        return (jsx$1("g", { part: "disc", children: drawRays(count, radius).map((d, i) => {
+                const r = count * 2;
+                let half = r / 2;
+                let xi = normal * (r * cn - r * cn * 2);
+                xi -= half * cn;
+                while (xi < 0)
+                    xi += r;
+                xi = i + xi;
+                xi %= r / rays;
+                half = r / rays / 2;
+                const light = 10 + 35 * 1.22 ** ((i % 12 === 0 ? 1.09 : 1.065) ** (xi < half ? xi : half - (xi - half)));
+                return jsx$1("path", { d: d, fill: `hsl(0,0%,${light}%)`, stroke: `hsl(0,0%,${light}%)` }, i);
+            }) }));
+    });
+    const MinMax = part(({ min, max, minMax }) => (jsxs("g", { part: "minmax", children: [jsx$1(TextAlignCenter, { fontSize: minMax.size, width: 50 + minMax.space, x: -minMax.space, y: 90 + minMax.pos, children: min }), jsx$1(TextAlignCenter, { fontSize: minMax.size, width: 50 + minMax.space, x: 50, y: 90 + minMax.pos, children: max })] })));
+    render(({ filters, circle, disc, fill, leds, line, marks, minMax, css, onPointerDown }) => (jsxs(Fragment, { children: [jsx$1("style", { children: jsx$1(Style, { lineWidth: line.width, fill: fill.size, disc: disc, css: css }) }), jsxs("svg", { part: "svg", viewBox: "0 0 100 120", onpointerdown: onPointerDown, children: [jsxs("svg", { part: "viewbox", viewBox: "0 0 100 100", children: [jsx$1("defs", { children: Object.entries(filters).map(([key, filters]) => filters.map((filter, i) => {
+                                    const { Filter } = filter;
+                                    return jsx$1(Filter, { id: key + i, ...filter });
+                                })) }), circle >= 0 && jsx$1(Circle, {}), marks.count >= 2 && jsx$1(Marks, {}), leds.count > 0 && jsx$1(Leds, {}), disc.radius > 0 && disc.behind && jsx$1(Disc, {}), jsxs("g", { part: "rotary", children: [jsx$1(RotaryKnob, {}), jsx$1(RotaryLine, {})] }), fill.size >= 0 && jsx$1(Fill, {}), disc.radius > 0 && !disc.behind && jsx$1(Disc, {})] }), minMax.size && jsx$1(MinMax, {})] })] })));
+})) {
+}
+
+customElements.define('x-knob', KnobElement);
+// @ts-ignore
+const fontUrl = new URL('Kanit-Light.ttf', import.meta.url).toString();
+document.body.innerHTML = /*html*/ `
+<style>
+@font-face {
+  src: url(${fontUrl}) format('truetype');
+  font-family: 'Kanit';
+  font-style: 'light';
+  font-display: 'fallback';
+}
+html,
+body {
+  width: 100%;
+  height: 100%;
+  background: #383838;
+}
+x-knob {
+  width: 150px;
+  height: 150px;
+  font-family: Kanit;
+}
+</style>
+<div id="demo" style="display:grid;grid:1fr 1fr 1fr/1fr 1fr 1fr;width:450px">
+<x-knob theme="power" value="50"></x-knob>
+<x-knob theme="intense" value="50"></x-knob>
+<x-knob theme="amp" value="5" max="11" step="0.1"></x-knob>
+<x-knob theme="retro" value="50"></x-knob>
+<x-knob theme="metallic" value="50"></x-knob>
+<x-knob theme="sweet" symmetric min="-60" value="0" max="60"></x-knob>
+<x-knob theme="flat" value="50"></x-knob>
+<x-knob theme="ableton" value="50"></x-knob>
+<x-knob theme="zen" value="50"></x-knob>
+</div>
+`;
+const knobs = document.querySelectorAll('x-knob');
+let i = 0;
+const ivl = setInterval(() => {
+    const knob = knobs[i++ % knobs.length];
+    knob.target += (knob.normal > 0.5 ? -1 : knob.normal === 0.5 ? (Math.random() - 0.5) * 2 : 1) * Math.random()
+        * knob.scale
+        * 0.95;
+    if (i >= knobs.length)
+        clearInterval(ivl);
+}, 60);
+</script>
+  </body>
+</html>

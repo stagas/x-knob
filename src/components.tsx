@@ -1,102 +1,151 @@
-import { h } from '@stagas/vele'
-import { drawRays } from './shapes'
+/** @jsxImportSource mixter/jsx */
 
-export const MinMax = ({
-  fontsize,
-  fontspace,
-  fontpos,
-  part,
-  min,
-  max,
-  y,
-}: {
-  fontsize: number
-  fontspace: number
-  fontpos: number
-  part: string
-  min: number
-  max: number
-  y: number
-}) => (
-  <g part={part}>
-    <TextAlignCenter fontsize={fontsize} width={50 - fontspace} x={fontspace} y={y + fontpos}>
-      {min}
-    </TextAlignCenter>
-    <TextAlignCenter fontsize={fontsize} width={50 - fontspace} x={50} y={y + fontpos}>
-      {max}
-    </TextAlignCenter>
-  </g>
-)
-
-export const Rotary = ({ part, normal, gap, children }: { part: string; normal: number; gap: number; children?: never }) => {
-  const start = gap / 2 - 90
-  const circle = 360 - gap
-  const degrees = normal * circle + start
-  return (
-    <g part={part} style={{ transform: `rotate(${degrees}deg)` }}>
-      {children}
-    </g>
-  )
-}
-
-export const Cone = ({ part, normal, gap }: { part: string; normal: number; gap: number }) => {
-  const cn = (360 - gap) / 360
-  return (
-    <g part={part}>
-      {drawRays(11).map((d, i) => {
-        const r = 11 * 2
-        const half = r / 2
-        let xi = normal * (r - r * (1 - cn)) + 1.6
-        xi -= half * cn
-        while (xi < 0) xi += r
-        xi = i + xi
-        xi %= r
-        const light =
-          5 +
-          1.2 *
-            1.38 **
-              (xi < half
-                ? xi //
-                : half - (xi - half))
-        return <path key={i} d={d} fill={`hsl(0,0%,${light}%)`} stroke={`hsl(0,0%,${light}%)`} />
-      })}
-    </g>
-  )
-}
-
-export const Disc = ({ part, disc, normal, gap }: { part: string; disc: number; normal: number; gap: number }) => {
-  const cn = (360 - gap) / 360
-  return (
-    <g part={part}>
-      {drawRays(131, disc || 20).map((d, i) => {
-        const r = 131 * 2
-        let half = r / 2
-        let xi = normal * (r * cn - r * cn * 2)
-        xi -= half * cn
-        while (xi < 0) xi += r
-
-        xi = i + xi
-        xi %= r / 5
-        half = r / 5 / 2
-        const light =
-          10 +
-          35 *
-            1.22 **
-              ((i % 12 === 0 ? 1.09 : 1.065) **
-                (xi < half
-                  ? xi //
-                  : half - (xi - half)))
-        return <path key={i} d={d} fill={`hsl(0,0%,${light}%)`} stroke={`hsl(0,0%,${light}%)`} />
-      })}
-    </g>
-  )
-}
-
-export const TextAlignCenter = ({ fontsize, width, x, y, children }: { fontsize: number; width: number; x: number; y: number; children?: never }) => (
+export const TextAlignCenter = (
+  { fontSize, width, x, y, children }: { fontSize: number; width: number; x: number; y: number; children?: never },
+) => (
   <g transform={`translate(${x},${y})`}>
     <rect width={width} height="0" fill="transparent"></rect>
-    <text x={width / 2} y="0" text-anchor="middle" font-size={fontsize} alignment-baseline="middle">
+    <text
+      x={width / 2}
+      y="0"
+      text-anchor="middle"
+      font-size={fontSize || 'var(--font-size)'}
+      alignment-baseline="middle"
+    >
       {children}
     </text>
   </g>
 )
+
+export const Style = (
+  { lineWidth, fill, disc, css }: { lineWidth: number; fill: number; disc: { radius: number }; css: string },
+) => /*css*/ `
+:host {
+  --font-size: 20;
+  --white: #fff;
+  --grey: #888;
+  --dark: #666;
+  --light: #aaa;
+  --black: #151515;
+  --cone-hue: 0;
+  --cone-sat: 0%;
+  font-family: sans-serif;
+  position: relative;
+  touch-action: none;
+  display: inline-flex;
+  align-items: center;
+  flex-flow: column nowrap;
+  justify-content: space-around;
+  user-select: none;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+/* [part=slot] {
+  display: flex;
+  place-items: center;
+  flex-flow: column nowrap;
+  width: 100%;
+}
+ */
+[part=svg] {
+  width: 100%;
+  height: 100%;
+  user-select: none;
+  overflow: hidden;
+}
+
+[part=viewbox] {
+  display: contents;
+  overflow: hidden;
+}
+
+[part=circle] {
+  fill: var(--black);
+}
+
+[part=arrow] {
+  fill: var(--black);
+}
+
+[part=line] {
+  stroke: var(--black);
+  stroke-width: ${lineWidth}px;
+  stroke-linejoin: round;
+}
+
+[part=dot] {
+  fill: var(--white);
+}
+
+[part=outline] {
+  fill: none;
+  stroke: var(--light);
+  stroke-width: 1px;
+}
+
+[part=fill] {
+  fill: none;
+  stroke: var(--dark);
+  stroke-width: ${fill || 5}px;
+}
+
+[part=fill-value] {
+  fill: none;
+  stroke: var(--white);
+  stroke-width: ${fill || 5}px;
+}
+
+[part=cone] {
+  stroke: var(--grey);
+}
+
+[part=marks] {
+  stroke: var(--dark);
+  stroke-width: 1px;
+}
+
+[part=leds] {
+  fill: var(--dark);
+  stroke: var(--dark);
+}
+
+[part=leds-value] {
+  fill: var(--black);
+  stroke: var(--white);
+  stroke-width: 2px;
+}
+
+[part=outline] {
+  fill: var(--black);
+  stroke: var(--grey);
+  stroke-width: 1px;
+}
+
+[part=shape] {
+  fill: var(--white);
+}
+
+[part=disc] {
+  display: contents;
+  box-sizing: border-box;
+  background: var(--grey);
+  box-shadow:
+    inset 4px 4px 8px -2px var(--white),
+    inset -4px -4px 8px -2px var(--dark);
+  width: ${disc.radius}%;
+  height: ${disc.radius}%;
+  border-radius: 100%;
+  z-index: 1;
+}
+
+[part=minmax] {
+  fill: var(--dark);
+}
+
+* {
+  transform-origin: 50% 50%;
+}
+
+${css ?? ''}`

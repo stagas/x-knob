@@ -1,26 +1,24 @@
-const { esbuildPlugin } = require('@web/dev-server-esbuild')
-const { summaryReporter } = require('@web/test-runner')
-const { fromRollup } = require('@web/dev-server-rollup')
-const rollupCommonjs = require('@rollup/plugin-commonjs')
-
-const commonjs = fromRollup(rollupCommonjs);
+const { chromeLauncher, summaryReporter } = require('@web/test-runner')
+const { vite } = require('wtr-plugin-vite')
 
 module.exports = {
   concurrency: 1,
   nodeResolve: true,
   files: ['test/**/*.spec.web.{ts,tsx}'],
-  plugins: [
-    esbuildPlugin({
-      ts: true,
-      tsx: true,
-      jsxFactory: 'h',
-      jsxFragment: 'Fragment',
-    }),
-    commonjs(),
-  ],
-  reporters: [
-    summaryReporter(),
-  ],
+  plugins: [vite()],
+  browsers: [chromeLauncher({
+    launchOptions: {
+      args: [
+        '--allow-insecure-localhost',
+        '--autoplay-policy=no-user-gesture-required',
+        '--ignore-certificate-errors',
+        '--mute-audio',
+        '--use-fake-device-for-media-stream',
+        '--use-fake-ui-for-media-stream',
+      ],
+    },
+  })],
+  reporters: [summaryReporter()],
   coverageConfig: {
     include: ['src/**/*.{ts,tsx}'],
   },

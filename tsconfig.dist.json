@@ -1,0 +1,21 @@
+{
+  "extends": "./tsconfig.json",
+  "include": [
+    "src"
+  ],
+  "exclude": [
+    "dist",
+    "example",
+    "node_modules",
+    "test",
+    "types"
+  ],
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "types": [
+      "./types/globals",
+      "./types/modules",
+      "node"
+    ]
+  }
+}
