@@ -19,5 +19,7 @@
       }
     },
     "keepClassNames": true
-  }
+  },
+  "sourceMaps": true,
+  "inlineSourcesContent": true
 }

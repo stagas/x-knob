@@ -16,11 +16,11 @@
     "**/*.{ts,tsx,js,jsx,cjs,mjs,json,md}"
   ],
   "excludes": [
-    "node_modules",
-    "coverage",
-    "dist",
-    ".swc",
-    ".vscode"
+    "node_modules/**/*",
+    "coverage/**/*",
+    "dist/**/*",
+    ".swc/**/*",
+    ".vscode/**/*"
   ],
   "plugins": [
     "https://plugins.dprint.dev/typescript-0.64.2.wasm",

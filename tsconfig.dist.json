@@ -15,7 +15,9 @@
     "types": [
       "./types/globals",
       "./types/modules",
-      "node"
+      "audioworklet",
+      "node",
+      "webmidi"
     ]
   }
 }
