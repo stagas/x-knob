@@ -1,5 +1,5 @@
 <h1>
-x-knob <a href="https://npmjs.org/package/x-knob"><img src="https://img.shields.io/badge/npm-v1.0.0-F00.svg?colorA=000"/></a> <a href="src"><img src="https://img.shields.io/badge/loc-1,224-FFF.svg?colorA=000"/></a> <a href="https://cdn.jsdelivr.net/npm/x-knob@1.0.0/dist/x-knob.min.js"><img src="https://img.shields.io/badge/brotli-8.2K-333.svg?colorA=000"/></a> <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-F0B.svg?colorA=000"/></a>
+x-knob <a href="https://npmjs.org/package/x-knob"><img src="https://img.shields.io/badge/npm-v1.0.1-F00.svg?colorA=000"/></a> <a href="src"><img src="https://img.shields.io/badge/loc-1,205-FFF.svg?colorA=000"/></a> <a href="https://cdn.jsdelivr.net/npm/x-knob@1.0.1/dist/x-knob.min.js"><img src="https://img.shields.io/badge/brotli-8.3K-333.svg?colorA=000"/></a> <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-F0B.svg?colorA=000"/></a>
 </h1>
 
 <p></p>
