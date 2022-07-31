@@ -1,4 +1,4 @@
-/** @jsxImportSource mixter/jsx */
+/** @jsxImportSource sigl */
 
 export const Inset = ({ id, dx, dy, blur, color }: any) => (
   <filter id={id} x="-20%" y="-20%" width="140%" height="140%">
