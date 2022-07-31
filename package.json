@@ -83,15 +83,15 @@
     "vite-open": "^2.4.0"
   },
   "dependencies": {
-    "everyday-utils": "file:../everyday-utils",
+    "everyday-utils": "^1.0.0",
     "memoize-pure": "^1.0.0",
-    "mixter": "file:../mixter",
-    "relative-mouse": "file:../relative-mouse",
-    "sigl": "file:../sigl"
+    "relative-mouse": "^1.0.1",
+    "sigl": "^0.0.1"
   },
   "trustedDependencies": [
     "@stagas/chalk",
     "@stagas/jest-node-exports-resolver",
+    "animatrix",
     "annotate-code",
     "apply-sourcemaps",
     "argtor",
@@ -106,7 +106,8 @@
     "everyday-utils",
     "fluent-event",
     "fluent-flags",
-    "get-element-offset",
+    "geometrik",
+    "is-mobile-agent",
     "html-jsx",
     "html-vdom",
     "mixter",
@@ -115,9 +116,9 @@
     "proxy-toolkit",
     "pull-configs",
     "puppeteer-pretty-console",
-    "relative-mouse",
     "rollup-plugin-debug",
     "run-in-vite",
+    "sigl",
     "to-fluent",
     "utr",
     "vite-open",
