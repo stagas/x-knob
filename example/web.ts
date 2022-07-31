@@ -42,7 +42,7 @@ const knobs = document.querySelectorAll('x-knob') as NodeListOf<KnobElement>
 let i = 0
 const ivl = setInterval(() => {
   const knob = knobs[i++ % knobs.length]
-  knob.target! += (knob.normal > 0.5 ? -1 : knob.normal === 0.5 ? (Math.random() - 0.5) * 2 : 1) * Math.random()
+  knob.targetValue! += (knob.normal > 0.5 ? -1 : knob.normal === 0.5 ? (Math.random() - 0.5) * 2 : 1) * Math.random()
     * knob.scale
     * 0.95
   if (i >= knobs.length) clearInterval(ivl)

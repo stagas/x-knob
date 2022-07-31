@@ -1,4 +1,4 @@
-/** @jsxImportSource mixter/jsx */
+/** @jsxImportSource sigl */
 
 export const TextAlignCenter = (
   { fontSize, width, x, y, children }: { fontSize: number; width: number; x: number; y: number; children?: never },
@@ -8,9 +8,9 @@ export const TextAlignCenter = (
     <text
       x={width / 2}
       y="0"
-      text-anchor="middle"
+      // text-anchor="middle"
       font-size={fontSize || 'var(--font-size)'}
-      alignment-baseline="middle"
+      // alignment-baseline="middle"
     >
       {children}
     </text>
@@ -18,9 +18,10 @@ export const TextAlignCenter = (
 )
 
 export const Style = (
-  { lineWidth, fill, disc, css }: { lineWidth: number; fill: number; disc: { radius: number }; css: string },
+  { lineWidth, fill, disc, extraCss }: { lineWidth: number; fill: number; disc: { radius: number }; extraCss: string },
 ) => /*css*/ `
 :host {
+  contain: layout style paint;
   --font-size: 20;
   --white: #fff;
   --grey: #888;
@@ -30,6 +31,7 @@ export const Style = (
   --cone-hue: 0;
   --cone-sat: 0%;
   font-family: sans-serif;
+  pointer-events: none;
   position: relative;
   touch-action: none;
   display: inline-flex;
@@ -50,15 +52,19 @@ export const Style = (
 }
  */
 [part=svg] {
+  contain: layout style paint;
   width: 100%;
   height: 100%;
   user-select: none;
   overflow: hidden;
+  shape-rendering: optimizeSpeed;
 }
 
 [part=viewbox] {
+  contain: size layout style paint;
   display: contents;
   overflow: hidden;
+  pointer-events: none;
 }
 
 [part=circle] {
@@ -131,9 +137,9 @@ export const Style = (
   display: contents;
   box-sizing: border-box;
   background: var(--grey);
-  box-shadow:
+  /* box-shadow:
     inset 4px 4px 8px -2px var(--white),
-    inset -4px -4px 8px -2px var(--dark);
+    inset -4px -4px 8px -2px var(--dark); */
   width: ${disc.radius}%;
   height: ${disc.radius}%;
   border-radius: 100%;
@@ -144,8 +150,12 @@ export const Style = (
   fill: var(--dark);
 }
 
+[part=rotary-outer] {
+  pointer-events: all;
+}
+
 * {
   transform-origin: 50% 50%;
 }
 
-${css ?? ''}`
+${extraCss ?? ''}`

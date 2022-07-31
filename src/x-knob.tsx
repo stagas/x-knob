@@ -1,149 +1,159 @@
-/** @jsxImportSource mixter/jsx */
-import { attrs, event, mixter, on, props, queue, shadow, state } from 'mixter'
-import { jsx } from 'mixter/jsx'
-import { getRelativeMouseFromEvent } from 'relative-mouse'
-import { Style, TextAlignCenter } from './components'
+/** @jsxImportSource sigl */
+import $ from 'sigl'
+
+import { cheapRandomId, pick } from 'everyday-utils'
+// import { getRelativeMouseFromEvent } from 'relative-mouse'
+
+import { Style } from './components'
 import { drawFill, drawLeds, drawMarks, drawRays, drawShape } from './shapes'
 import { themes } from './themes'
 
-export class KnobElement extends mixter(
-  HTMLElement,
-  shadow(),
-  attrs(
-    class {
-      theme = ''
-      css = ''
+export interface KnobElement extends $.Element<KnobElement> {}
 
-      value = 0
+@$.element()
+export class KnobElement extends HTMLElement {
+  @$.attr.out() id = cheapRandomId()
 
-      min = 0
-      max = 100
-      step = 1
+  @$.attr() theme = ''
+  @$.attr() extraCss = ''
 
-      symmetric = false
+  @$.attr.out() value = 0
+  @$.attr() vertical = false
 
-      circle = -1
-      gap = 30
-    }
-  ),
-  props(
-    class {
-      filters: any = {
-        rotary: [],
-        rotaryLine: [],
+  @$.attr.out() min = $.Number
+  @$.attr.out() max = $.Number
+  @$.attr.out() step = $.Number
+
+  // TODO: autoSymmetric
+  @$.attr() symmetric = false
+
+  @$.attr() circle = 0
+  @$.attr() gap = 30
+
+  filters: any = {
+    rotary: [],
+    rotaryLine: [],
+  }
+
+  cone = {
+    radius: 28,
+    rays: 0,
+    shine: 1.2,
+    contrast: 1.38,
+  }
+
+  disc = {
+    behind: false,
+    radius: 0,
+    rays: 5,
+    count: 131,
+  }
+
+  leds = {
+    count: 0,
+    size: 5,
+    radius: 30,
+  }
+
+  marks = {
+    count: 0,
+    radius: 40,
+    big: 7,
+    small: 4,
+  }
+
+  arrow = {
+    size: 0,
+    pos: 23,
+    width: 5,
+  }
+
+  fill = {
+    radius: 37,
+    size: -1,
+    gap: 6,
+  }
+
+  line = {
+    size: 0,
+    pos: 25,
+    width: 6.5,
+  }
+
+  dot = {
+    size: 0,
+    pos: 25,
+  }
+
+  minMax = {
+    size: 0,
+    pos: 10,
+    space: 10,
+  }
+
+  shape = {
+    radius: 0,
+    notches: 15,
+    tension: 1.6,
+    edge: 1.4,
+    gap: 5,
+  }
+
+  targetValue?: number
+
+  /** @private */
+  scale = 1
+  /** @private */
+  normal = 0
+  /** @private */
+  vel = 0
+  /** @private */
+  degrees = 0
+
+  /** @private */
+  pointer = {
+    id: -1,
+    x: 0,
+    y: 0,
+  }
+  /** @private */
+  pointerDown = false
+
+  /** @private */
+  start = {
+    y: -1,
+    value: 0,
+  }
+
+  svg?: SVGSVGElement
+  rotary?: SVGGElement
+
+  /** @private */
+  resetStart?: () => void
+  /** @private */
+  updatePointer?: (e: PointerEvent) => void
+  /** @private */
+  onPointerMove?: (e: PointerEvent) => void
+  /** @private */
+  onPointerDown?: (e: PointerEvent) => void
+  /** @private */
+  onWheel?: (e: WheelEvent) => void
+
+  mounted($: KnobElement['$']) {
+    $.effect(({ theme }) => {
+      if (theme) {
+        const next = themes[theme]
+        const prev = pick($, Object.keys(next) as any)
+        queueMicrotask(() => {
+          Object.assign($, next)
+        })
+        return () => {
+          Object.assign($, prev)
+        }
       }
-
-      cone = {
-        radius: 28,
-        rays: 0,
-        shine: 1.2,
-        contrast: 1.38,
-      }
-
-      disc = {
-        behind: false,
-        radius: 0,
-        rays: 5,
-        count: 131,
-      }
-
-      leds = {
-        count: 0,
-        size: 5,
-        radius: 30,
-      }
-
-      marks = {
-        count: 0,
-        radius: 40,
-        big: 7,
-        small: 4,
-      }
-
-      arrow = {
-        size: 0,
-        pos: 23,
-        width: 5,
-      }
-
-      fill = {
-        radius: 37,
-        size: -1,
-        gap: 6,
-      }
-
-      line = {
-        size: 0,
-        pos: 25,
-        width: 6.5,
-      }
-
-      dot = {
-        size: 0,
-        pos: 25,
-      }
-
-      minMax = {
-        size: 0,
-        pos: 10,
-        space: 10,
-      }
-
-      shape = {
-        radius: 0,
-        notches: 15,
-        tension: 1.6,
-        edge: 1.4,
-        gap: 5,
-      }
-
-      target?: number
-
-      /** @private */
-      scale = 1
-      /** @private */
-      normal = 0
-      /** @private */
-      vel = 0
-      /** @private */
-      degrees = 0
-
-      /** @private */
-      pointer = {
-        id: -1,
-        x: 0,
-        y: 0,
-      }
-      /** @private */
-      pointerDown = false
-
-      /** @private */
-      start = {
-        y: -1,
-        value: 0,
-      }
-
-      /** @private */
-      resetStart?: () => void
-      /** @private */
-      updatePointer?: (e: PointerEvent) => void
-      /** @private */
-      onPointerMove?: (e: PointerEvent) => void
-      /** @private */
-      onPointerDown?: (e: PointerEvent) => void
-      /** @private */
-      onWheel?: (e: WheelEvent) => void
-    }
-  ),
-  state<KnobElement>(({ $, effect, reduce }) => {
-    const { part, render } = jsx($)
-
-    effect(({ host, theme }) => {
-      if (theme)
-        Object.assign(host, themes[theme])
     })
 
-    $.scale = reduce(({ min, max }) => {
+    $.scale = $.reduce(({ min, max }) => {
       // this guard is the case where attribute 'min' arrives before 'max'
       // and there are operations that rely on 'max - min' (scale) being >0
       if (max - min <= 0) $.max = min + 1
@@ -151,82 +161,91 @@ export class KnobElement extends mixter(
       return max - min
     })
 
-    $.target = reduce(({ target, min, max }) => Math.max(min, Math.min(max, target)))
-    $.value = reduce(({ value, min, max }) => Math.max(min, Math.min(max, value)))
+    $.targetValue = $.reduce(({ targetValue, min, max }) => Math.max(min, Math.min(max, targetValue)))
+    $.value = $.reduce(({ value, min, max }) => Math.max(min, Math.min(max, value)))
 
-    effect(({ value }) => {
-      if ($.target == null) $.target = value
+    $.effect(({ value }) => {
+      if ($.targetValue == null) $.targetValue = value
     })
 
-    $.normal = reduce(({ value, min, scale }) => (value - min) / scale)
+    $.normal = $.reduce(({ value, min, scale }) => (value - min) / scale)
 
-    $.degrees = reduce(({ normal, gap }) => {
+    $.degrees = $.reduce(({ normal, gap }) => {
       const start = gap / 2 - 90
       const circle = 360 - gap
       return normal * circle + start
     })
 
-    effect(({ host, value: _ }) => {
-      host.dispatchEvent(new InputEvent('input'))
+    // the raf here is to have time to receive the value from the compiler
+    $.effect.raf(({ host, value: _, min: _0, max: _1 }) => {
+      $.dispatch.composed(host, 'input')
     })
 
-    $.onPointerMove = reduce(({ host }) => (e => {
+    $.onPointerMove = $.reduce(() => (e => {
       if (e.pointerId !== $.pointer.id) return
       $.pointer = {
         id: e.pointerId,
-        ...getRelativeMouseFromEvent(host, e),
+        ...({ x: e.pageX, y: e.pageY }), //getRelativeMouseFromEvent(host, e),
       }
     }))
 
-    const draw = queue().raf(() => {
-      $.vel *= 0.66
-      if (Math.abs($.target! - $.value) > $.step * 0.15) {
-        $.vel += ($.target! - $.value) * 0.064
-        // if (Math.abs($.vel) > $.step * 14) {
-        //   $.value = $.target
-        //   $.vel = 0
-        //   return
-        // }
-        $.value += $.vel
-        if (($.vel < 0 && $.target! > $.value) || ($.vel > 0 && $.target! < $.value)) {
-          $.value = $.target!
-          $.vel = 0
+    const draw = $.queue.raf(() =>
+      $.mutate(() => {
+        if ($.step == null) return
+        const target = $.targetValue!
+        $.vel *= 0.66
+        if (Math.abs(target - $.value) > $.step * 0.15) {
+          $.vel += (target - $.value) * 0.064
+          // if (Math.abs($.vel) > $.step * 14) {
+          //   $.value = $.target
+          //   $.vel = 0
+          //   return
+          // }
+          const result = $.value + $.vel
+          if ((target > $.value && result > target) || (target < $.value && result < target)) {
+            $.value = target
+            $.vel = 0
+          } else {
+            $.value = result
+            requestAnimationFrame(draw)
+          }
+          // if (($.vel < 0 && $.target! > $.value) || ($.vel > 0 && $.target! < $.value)) {
+          //   $.value = $.target!
+          //   $.vel = 0
+          // } else {
+          // }
         } else {
-          requestAnimationFrame(draw)
+          $.value = $.targetValue!
+          $.vel = 0
         }
-      } else {
-        $.value = $.target!
-        $.vel = 0
-      }
-    })
+      })
+    )
 
-    effect(({ target: _ }) => {
+    $.effect(({ targetValue: _ }) => {
       draw()
     })
 
-    effect(({ pointerDown, pointer, start, scale }) => {
+    $.effect(({ pointerDown, pointer, start, scale }) => {
       if (!pointerDown) return
-      $.target = start.value + (start.y - pointer.y) * scale * 0.01
+      $.targetValue = start.value + (start.y - pointer.y) * scale * 0.01
     })
 
-    effect(({ pointerDown, onPointerMove }) => {
+    $.effect(({ pointerDown, onPointerMove }) => {
       if (!pointerDown) return
 
-      const off = on()(window, 'pointermove', onPointerMove)
-      const offOnce = on().once(window, 'pointerup', () => {
+      const off: $.Off = $.on(window).pointermove(onPointerMove)
+      const offOnce = $.on(window).pointerup.once(() => {
         $.pointerDown = false
         off()
       })
-      return () => {
-        off()
-        offOnce()
-      }
+
+      return $.chain(off, offOnce)
     })
 
-    $.onPointerDown = reduce(({ host }) => (e => {
+    $.onPointerDown = $.reduce(() => (e => {
       $.pointer = {
         id: e.pointerId,
-        ...getRelativeMouseFromEvent(host, e),
+        ...({ x: e.pageX, y: e.pageY }), //getRelativeMouseFromEvent(host, e),
       }
       $.start = {
         y: $.pointer.y,
@@ -235,38 +254,38 @@ export class KnobElement extends mixter(
       $.pointerDown = true
     }))
 
-    $.onWheel = reduce(({ step, scale }) => ((e: WheelEvent) => {
+    $.onWheel = $.reduce(({ step, scale }) => (e => {
       const mul = e.deltaMode === 1 ? 15 : 1.12
       const sign = Math.sign(e.deltaY)
       const abs = Math.abs(e.deltaY) * mul
-      $.target! += Math.max(step, abs * 0.0005 * scale) * sign * (e.shiftKey ? 0.2 : 1)
+      $.targetValue! += Math.max(step, abs * 0.0005 * scale) * sign * (e.shiftKey ? 0.2 : 1)
     }))
 
-    effect(({ host, onWheel }) => on().active(host, 'wheel', event().prevent.stop(onWheel)))
+    $.effect(({ rotary, onWheel }) => $.on(rotary).wheel.not.passive.prevent.stop(onWheel))
 
-    const Circle = part(({ circle }) => <circle part="circle" cx="50" cy="50" r={circle || 36} />)
+    const Circle = $.part(({ circle }) => <circle part="circle" cx="50" cy="50" r={circle || 36} />)
 
-    const Fill = part(({ normal, fill, gap, symmetric }) => (
+    const Fill = $.part(({ normal, fill, gap, symmetric }) => (
       <g>
         <path part="fill" d={drawFill(normal, fill.radius, fill.gap, gap, symmetric)} />
         <path part="fill-value" d={drawFill(normal, fill.radius, fill.gap, gap, symmetric, true)} />
       </g>
     ))
 
-    const Leds = part(({ normal, leds, gap, symmetric }) => (
+    const Leds = $.part(({ normal, leds, gap, symmetric }) => (
       <g>
         <path part="leds" d={drawLeds(normal, leds.count, leds.radius, leds.size, gap, symmetric)} />
         <path part="leds-value" d={drawLeds(normal, leds.count, leds.radius, leds.size, gap, symmetric, true)} />
       </g>
     ))
 
-    const Marks = part(({ marks, gap }) => (
+    const Marks = $.part(({ marks, gap }) => (
       <g>
         <path part="marks" d={drawMarks(marks.count, marks.radius, marks.big, marks.small, gap)} />
       </g>
     ))
 
-    const Cone = part(({ normal, gap, cone }) => {
+    const Cone = $.part(({ normal, gap, cone }) => {
       const cn = (360 - gap) / 360
       const { rays, contrast, shine, radius } = cone
       return (
@@ -293,7 +312,7 @@ export class KnobElement extends mixter(
       )
     })
 
-    const Shape = part(({ shape }) => (
+    const Shape = $.part(({ shape }) => (
       <g>
         <defs>
           <clipPath id="shape">
@@ -309,7 +328,7 @@ export class KnobElement extends mixter(
       </g>
     ))
 
-    const Line = part(({ line, shape }) => (
+    const Line = $.part(({ line, shape }) => (
       <path
         part="line"
         clip-path={shape.radius > 0 ? 'url(#shape)' : null}
@@ -317,9 +336,9 @@ export class KnobElement extends mixter(
       />
     ))
 
-    const Dot = part(({ dot }) => <circle part="dot" cx={dot.pos} cy="50" r={dot.size} />)
+    const Dot = $.part(({ dot }) => <circle part="dot" cx={dot.pos} cy="50" r={dot.size} />)
 
-    const Arrow = part(({ arrow }) => (
+    const Arrow = $.part(({ arrow }) => (
       <path
         part="arrow"
         d={`M ${arrow.pos} 50 L ${arrow.pos + arrow.size} ${50 - arrow.width} L ${arrow.pos + arrow.size} ${
@@ -328,7 +347,7 @@ export class KnobElement extends mixter(
       />
     ))
 
-    const RotaryKnob = part(({ filters, degrees, cone, shape }) => {
+    const RotaryKnob = $.part(({ filters, degrees, cone, shape }) => {
       return (
         <g
           part="rotary-knob-filters"
@@ -342,7 +361,7 @@ export class KnobElement extends mixter(
       )
     })
 
-    const RotaryLine = part(({ filters, degrees, dot, line, arrow }) => {
+    const RotaryLine = $.part(({ filters, degrees, dot, line, arrow }) => {
       return (
         <g
           part="rotary-line-filters"
@@ -358,7 +377,7 @@ export class KnobElement extends mixter(
       )
     })
 
-    const Disc = part(({ disc, normal, gap }) => {
+    const Disc = $.part(({ disc, normal, gap }) => {
       const cn = (360 - gap) / 360
       const { count, radius, rays } = disc
       return (
@@ -379,23 +398,28 @@ export class KnobElement extends mixter(
       )
     })
 
-    const MinMax = part(({ min, max, minMax }) => (
-      <g part="minmax">
-        <TextAlignCenter fontSize={minMax.size} width={50 + minMax.space} x={-minMax.space} y={90 + minMax.pos}>
-          {min}
-        </TextAlignCenter>
-        <TextAlignCenter fontSize={minMax.size} width={50 + minMax.space} x={50} y={90 + minMax.pos}>
-          {max}
-        </TextAlignCenter>
-      </g>
-    ))
+    // const MinMax = $.part(({ min, max, minMax }) => (
+    //   <g part="minmax">
+    //     <TextAlignCenter fontSize={minMax.size} width={50 + minMax.space} x={-minMax.space} y={90 + minMax.pos}>
+    //       {min}
+    //     </TextAlignCenter>
+    //     <TextAlignCenter fontSize={minMax.size} width={50 + minMax.space} x={50} y={90 + minMax.pos}>
+    //       {max}
+    //     </TextAlignCenter>
+    //   </g>
+    // ))
 
-    render(({ filters, circle, disc, fill, leds, line, marks, minMax, css, onPointerDown }) => (
+    $.render(({ filters, disc, fill, leds, line, marks, extraCss, onPointerDown, vertical }) => (
       <>
         <style>
-          <Style lineWidth={line.width} fill={fill.size} disc={disc} css={css} />
+          <Style lineWidth={line.width} fill={fill.size} disc={disc} extraCss={extraCss} />
         </style>
-        <svg part="svg" viewBox="0 0 100 120" onpointerdown={onPointerDown}>
+        <svg
+          part="svg"
+          ref={$.ref.svg}
+          preserveAspectRatio={vertical ? 'xMaxYMid' : 'xMidYMax'}
+          viewBox="0 0 100 120"
+        >
           <svg part="viewbox" viewBox="0 0 100 100">
             <defs>
               {Object.entries(filters).map(([key, filters]: any) =>
@@ -405,20 +429,23 @@ export class KnobElement extends mixter(
                 })
               )}
             </defs>
-            {circle >= 0 && <Circle />}
-            {marks.count >= 2 && <Marks />}
-            {leds.count > 0 && <Leds />}
-            {disc.radius > 0 && disc.behind && <Disc />}
-            <g part="rotary">
-              <RotaryKnob />
-              <RotaryLine />
+            <g part="rotary-outer" ref={$.ref.rotary} onpointerdown={onPointerDown}>
+              <Circle />
+              {marks.count >= 2 && <Marks />}
+              {leds.count > 0 && <Leds />}
+              {disc.radius > 0 && disc.behind && <Disc />}
+              <g part="rotary">
+                <RotaryKnob />
+                <RotaryLine />
+              </g>
+              {fill.size >= 0 && <Fill />}
+              {disc.radius > 0 && !disc.behind && <Disc />}
             </g>
-            {fill.size >= 0 && <Fill />}
-            {disc.radius > 0 && !disc.behind && <Disc />}
           </svg>
-          {minMax.size && <MinMax />}
+          {/* TODO: <text> trigger layout, need to rewrite using foreignElement + span */}
+          {/* {minMax.size && <MinMax />} */}
         </svg>
       </>
     ))
-  })
-) {}
+  }
+}

@@ -9,7 +9,7 @@ export const themes: Record<
   >
 > = {
   ableton: {
-    css: /*css*/ `
+    extraCss: /*css*/ `
       [part=line] {
         stroke:var(--white)
       }
@@ -30,12 +30,12 @@ export const themes: Record<
     },
   },
   retro: {
-    css: /*css*/ `
+    extraCss: /*css*/ `
       [part=arrow] {
         fill:var(--white)
       }
       [part=rotary] {
-        filter: drop-shadow(2px 2px 1px #0005);
+        /* filter: drop-shadow(2px 2px 1px #0005); */
       }
       [part=leds-value] {
         stroke-width: 1px;
@@ -99,7 +99,7 @@ export const themes: Record<
     },
   },
   metallic: {
-    css: /*css*/ `
+    extraCss: /*css*/ `
       [part=dot] {
         fill: var(--black);
       }
@@ -149,7 +149,7 @@ export const themes: Record<
     },
   },
   sweet: {
-    css: /*css*/ `
+    extraCss: /*css*/ `
       [part=outline] {
         display:none
       }`,
@@ -186,6 +186,55 @@ export const themes: Record<
       space: -5,
     },
   },
+  dark: {
+    extraCss: /*css*/ `
+      [part=outline] {
+        display:none
+      }
+      [part=circle] {
+        fill: var(--black);
+      }
+      [part=line] {
+        stroke: var(--white);
+      }
+      [part=leds-value] {
+        stroke:var(--white);
+        stroke-width: 1px;
+      }
+      `,
+    gap: 60,
+    // marks: {
+    //   count: 0,
+    //   radius: 40,
+    //   big: 7,
+    //   small: 4,
+    // },
+    fill: {
+      radius: 35,
+      size: 1.75,
+      gap: 0,
+    },
+    // cone: {
+    //   radius: 37,
+    //   rays: 30,
+    //   shine: 1.92,
+    //   contrast: 1.1,
+    // },
+    circle: 35,
+    line: { size: 9, pos: 31, width: 5 },
+    // shape: {
+    //   radius: 47,
+    //   notches: 15,
+    //   tension: 1.6,
+    //   edge: 1.4,
+    //   gap: 5,
+    // },
+    // minMax: {
+    //   size: 11,
+    //   pos: 4,
+    //   space: -5,
+    // },
+  },
   // dark: {
   //   gap: 91,
   //   marks: 45,
@@ -202,7 +251,7 @@ export const themes: Record<
   //   lineWidth: 6.5,
   // },
   power: {
-    css: /*css*/ `
+    extraCss: /*css*/ `
       [part=shape] {
         fill: var(--black)
       }
@@ -213,7 +262,7 @@ export const themes: Record<
         stroke-width: 0px;
       }
       [part=rotary] {
-        filter: drop-shadow(0.5px 2px 2px #0005);
+        /* filter: drop-shadow(0.5px 2px 2px #0005); */
       }
       [part=circle] {
         stroke: var(--black);
@@ -280,7 +329,7 @@ export const themes: Record<
     },
   },
   intense: {
-    css: /*css*/ `
+    extraCss: /*css*/ `
       [part=shape] {
         fill: var(--black);
       }
@@ -291,7 +340,7 @@ export const themes: Record<
         stroke-width: 0px;
       }
       [part=rotary] {
-        filter: drop-shadow(1.15px 3px 1.5px rgba(0,0,0,.28));
+        /* filter: drop-shadow(1.15px 3px 1.5px rgba(0,0,0,.28)); */
       }
       [part=circle] {
         fill: var(--black);
@@ -357,7 +406,7 @@ export const themes: Record<
     },
   },
   amp: {
-    css: /*css*/ `
+    extraCss: /*css*/ `
       [part=shape] {
         fill: var(--black);
       }
@@ -368,7 +417,7 @@ export const themes: Record<
         stroke-width: 0px;
       }
       [part=rotary] {
-        filter: drop-shadow(1.15px 3px 1.5px rgba(0,0,0,.28));
+        /* filter: drop-shadow(1.15px 3px 1.5px rgba(0,0,0,.28)); */
       }
       [part=circle] {
         fill: var(--black);
@@ -434,7 +483,7 @@ export const themes: Record<
     },
   },
   flat: {
-    css: /*css*/ `
+    extraCss: /*css*/ `
       [part=shape] {
         fill: var(--black);
       }
@@ -503,7 +552,7 @@ export const themes: Record<
       edge: 1.4,
       gap: 5,
     },
-    css:
+    extraCss:
       '\n      [part=shape] {\n        fill: var(--black)\n      }\n      [part=line] {\n        stroke: var(--light)\n      }\n      [part=outline] {\n        stroke-width: 0px;\n      }\n      [part=circle] {\n        stroke: var(--black);\n        fill: var(--black);\n      }',
   },
   // compass: {

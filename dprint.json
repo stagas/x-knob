@@ -4,11 +4,12 @@
   "typescript": {
     "arguments.trailingCommas": "never",
     "arrowFunction.useParentheses": "preferNone",
+    "commentLine.forceSpaceAfterSlashes": false,
     "jsx.quoteStyle": "preferDouble",
     "quoteProps": "asNeeded",
     "quoteStyle": "alwaysSingle",
     "semiColons": "asi",
-    "useBraces": "preferNone"
+    "useBraces": "maintain"
   },
   "json": {},
   "markdown": {},
@@ -23,8 +24,8 @@
     ".vscode/**/*"
   ],
   "plugins": [
-    "https://plugins.dprint.dev/typescript-0.64.2.wasm",
-    "https://plugins.dprint.dev/json-0.14.1.wasm",
-    "https://plugins.dprint.dev/markdown-0.12.2.wasm"
+    "https://unpkg.com/@stagas/dprint-plugin-typescript-binary/dprint_plugin_typescript.wasm@8114f452af5a7244132b68b7a04371467ff508c4d1b7d3cb9e3613921e333a7e",
+    "https://plugins.dprint.dev/json-0.15.3.wasm",
+    "https://plugins.dprint.dev/markdown-0.13.3.wasm"
   ]
 }
