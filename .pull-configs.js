@@ -7,14 +7,17 @@ const remote = 'https://github.com/stagas/typescript-minimal-template/raw/main/'
 const { assign, omit, sort, merge, replace } = pullConfigs(remote, local)
 
 merge('package.json', (prev, next) => {
-  prev.trustedDependencies ??= []
-  prev.trustedDependencies = [
-    ...new Set([...prev.trustedDependencies, ...(next.trustedDependencies ?? [])]),
-  ].sort()
+  // deprecated: now using ~/.trusted-npm-deps per system configuration
+  delete prev.trustedDependencies
+
   prev.types = next.types
   prev.scripts = next.scripts
   prev.files = next.files
   sort(assign(prev.devDependencies, next.devDependencies))
+
+  // never used it - OTR screen acts like review so
+  // it can be accidentally published anyway. also i dont care
+  delete prev.private
 
   // deprecated
   delete prev.devDependencies['@stagas/documentation-fork']
@@ -22,6 +25,7 @@ merge('package.json', (prev, next) => {
   delete prev.devDependencies['@stagas/sucrase-jest-plugin']
   delete prev.devDependencies['@web/dev-server-esbuild']
   delete prev.devDependencies['@web/dev-server-rollup']
+  delete prev.devDependencies['@web/test-runner']
   delete prev.devDependencies['esbuild']
   delete prev.devDependencies['esbuild-register']
   delete prev.devDependencies['prettier']
