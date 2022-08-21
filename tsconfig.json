@@ -42,7 +42,7 @@
     "incremental": true,
     "module": "commonjs",
     "target": "esnext",
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "strict": true
   }
 }

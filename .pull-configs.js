@@ -32,13 +32,13 @@ merge('package.json', (prev, next) => {
   delete prev.devDependencies['terser']
   delete prev.devDependencies['vite-web-test-runner-plugin']
   delete prev.devDependencies['@swc-node/jest']
-  delete prev.devDependencies['chokidar']
   delete prev.devDependencies['jest']
   delete prev.devDependencies['jest-browser-globals']
   delete prev.devDependencies['ts-jest']
   delete prev.devDependencies['ts-node']
   delete prev.devDependencies['wtr-plugin-vite']
   delete prev.devDependencies['@stagas/jest-node-exports-resolver']
+  delete prev.devDependencies['vite-open']
 })
 replace('.gitattributes')
 replace('.gitignore')

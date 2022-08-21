@@ -3,7 +3,7 @@
   "author": "stagas",
   "short": "stagas/x-knob",
   "description": "Web Component Knobs",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -29,17 +29,15 @@
     "!**/*.tsbuildinfo"
   ],
   "scripts": {
-    "start:web": "vite-open example/web --https",
-    "start:web:debugging": "vite-open example/web --https --debugging-this",
+    "start:web": "devito example/web",
+    "start:web:debugging": "devito example/web --debugging-this",
     "start:node": "onchange -i src example -- swcno example/node.ts",
     "build:watch": "fastpm autolink && tsc -p tsconfig.dist.json --outDir dist/types --watch & swc -w -C module.type=commonjs ./src -d dist/cjs -w & swc -w -C module.type=es6 ./src -d dist/esm",
     "build:dist": "npm run build:bundle && npm run build:min",
     "cov:watch": "utr --coverage --watch",
     "clean": "rimraf dist",
     "docs": "dokio -o README.md && dprint fmt README.md",
-    "test": "npm run test:node && npm run test:web",
-    "test:node": "if find test -type f -iregex '.*\\.spec\\.\\(js\\|jsx\\|ts\\|tsx\\)$' | grep -q .; then utr 'test/*.spec.{js,jsx,ts,tsx}'; else echo no node tests; fi",
-    "test:web": "if find test -type f -iregex '.*\\.spec\\.web\\.\\(js\\|jsx\\|ts\\|tsx\\)$' | grep -q .; then utr --browser 'test/*.spec.web.{js,jsx,ts,tsx}'; else echo no web tests; fi",
+    "test": "utr",
     "cov": "utr --coverage",
     "build": "npm run build:cjs & npm run build:esm & npm run build:types && echo done.",
     "build:cjs": "swc -C module.type=commonjs ./src -d dist/cjs",
@@ -67,6 +65,7 @@
     "@typescript-eslint/parser": "5.31.0",
     "bunzee": "^1.0.0",
     "chokidar": "3.5.3",
+    "devito": "^2.0.0",
     "dokio": "^1.1.0",
     "dprint": "0.30.3",
     "eslint": "8.20.0",
@@ -79,8 +78,7 @@
     "rimraf": "3.0.2",
     "swcno": "0.1.1",
     "typescript": "4.7.3",
-    "utr": "^1.3.3",
-    "vite-open": "^3.1.0"
+    "utr": "^1.3.1"
   },
   "dependencies": {
     "everyday-utils": "^1.2.0",
