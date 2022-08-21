@@ -81,7 +81,7 @@ export const themes: Record<
       size: -1,
       gap: 0,
     },
-    circle: -1,
+    circle: void 0,
     arrow: {
       size: 9,
       pos: 19.4,
@@ -381,7 +381,7 @@ export const themes: Record<
       size: 5,
       radius: 30,
     },
-    circle: -1,
+    circle: void 0,
     line: {
       size: 8,
       pos: 27,
@@ -458,7 +458,7 @@ export const themes: Record<
       size: 7,
       radius: 33,
     },
-    circle: -1,
+    circle: void 0,
     line: {
       size: 8,
       pos: 27,
@@ -584,7 +584,7 @@ export const themes: Record<
   //   disc: -1,
   //   fill: 2,
   //   fillGap: 6,
-  //   circle: -1,
+  //   circle: 0,
   //   radius: 30,
   //   arrow: 40.5,
   //   arrowPos: 10.5,
