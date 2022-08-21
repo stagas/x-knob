@@ -1,7 +1,7 @@
 /** @jsxImportSource sigl */
 import $ from 'sigl'
 
-import { cheapRandomId, pick } from 'everyday-utils'
+import { cheapRandomId } from 'everyday-utils'
 // import { getRelativeMouseFromEvent } from 'relative-mouse'
 
 import { Style } from './components'
@@ -9,6 +9,80 @@ import { drawFill, drawLeds, drawMarks, drawRays, drawShape } from './shapes'
 import { themes } from './themes'
 
 export interface KnobElement extends $.Element<KnobElement> {}
+
+class Theme {
+  circle = 0
+  gap = 30
+
+  filters: any = {
+    rotary: [],
+    rotaryLine: [],
+  }
+
+  cone = {
+    radius: 28,
+    rays: 0,
+    shine: 1.2,
+    contrast: 1.38,
+  }
+
+  disc = {
+    behind: false,
+    radius: 0,
+    rays: 5,
+    count: 131,
+  }
+
+  leds = {
+    count: 0,
+    size: 5,
+    radius: 30,
+  }
+
+  marks = {
+    count: 0,
+    radius: 40,
+    big: 7,
+    small: 4,
+  }
+
+  arrow = {
+    size: 0,
+    pos: 23,
+    width: 5,
+  }
+
+  fill = {
+    radius: 37,
+    size: -1,
+    gap: 6,
+  }
+
+  line = {
+    size: 0,
+    pos: 25,
+    width: 6.5,
+  }
+
+  dot = {
+    size: 0,
+    pos: 25,
+  }
+
+  minMax = {
+    size: 0,
+    pos: 10,
+    space: 10,
+  }
+
+  shape = {
+    radius: 0,
+    notches: 15,
+    tension: 1.6,
+    edge: 1.4,
+    gap: 5,
+  }
+}
 
 @$.element()
 export class KnobElement extends HTMLElement {
@@ -142,14 +216,7 @@ export class KnobElement extends HTMLElement {
   mounted($: KnobElement['$']) {
     $.effect(({ theme }) => {
       if (theme) {
-        const next = themes[theme]
-        const prev = pick($, Object.keys(next) as any)
-        queueMicrotask(() => {
-          Object.assign($, next)
-        })
-        return () => {
-          Object.assign($, prev)
-        }
+        Object.assign($, new Theme(), themes[theme])
       }
     })
 
@@ -409,7 +476,10 @@ export class KnobElement extends HTMLElement {
     //   </g>
     // ))
 
-    $.render(({ filters, disc, fill, leds, line, marks, extraCss, onPointerDown, vertical }) => (
+    // .task here fixes issues with changing theme corrupting the view
+    $.render.task((
+      { filters, disc, fill, leds, line, marks, extraCss, onPointerDown, onWheel, vertical },
+    ) => (
       <>
         <style>
           <Style lineWidth={line.width} fill={fill.size} disc={disc} extraCss={extraCss} />
