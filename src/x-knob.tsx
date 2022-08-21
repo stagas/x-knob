@@ -475,7 +475,7 @@ export class KnobElement extends HTMLElement {
 
     // .task here fixes issues with changing theme corrupting the view
     $.render.task((
-      { filters, disc, fill, leds, line, marks, extraCss, onPointerDown, onWheel, vertical },
+      { filters, circle, disc, fill, leds, line, marks, extraCss, onPointerDown, onWheel, vertical },
     ) => (
       <>
         <style>
@@ -514,7 +514,7 @@ export class KnobElement extends HTMLElement {
               })}
               onpointerdown={onPointerDown}
             >
-              <Circle />
+              {circle && <Circle />}
               {marks.count >= 2 && <Marks />}
               {leds.count > 0 && <Leds />}
               {disc.radius > 0 && disc.behind && <Disc />}
