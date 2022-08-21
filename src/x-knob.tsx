@@ -202,15 +202,14 @@ export class KnobElement extends HTMLElement {
   svg?: SVGSVGElement
   rotary?: SVGGElement
 
-  /** @private */
+  isHovering = false
+
   resetStart?: () => void
-  /** @private */
   updatePointer?: (e: PointerEvent) => void
-  /** @private */
   onPointerMove?: (e: PointerEvent) => void
-  /** @private */
   onPointerDown?: (e: PointerEvent) => void
-  /** @private */
+  onPointerLeave?: (e: PointerEvent) => void
+  onHover?: (e: PointerEvent) => void
   onWheel?: (e: WheelEvent) => void
 
   mounted($: KnobElement['$']) {
@@ -327,8 +326,6 @@ export class KnobElement extends HTMLElement {
       const abs = Math.abs(e.deltaY) * mul
       $.targetValue! += Math.max(step, abs * 0.0005 * scale) * sign * (e.shiftKey ? 0.2 : 1)
     }))
-
-    $.effect(({ rotary, onWheel }) => $.on(rotary).wheel.not.passive.prevent.stop(onWheel))
 
     const Circle = $.part(({ circle }) => <circle part="circle" cx="50" cy="50" r={circle || 36} />)
 
@@ -499,7 +496,24 @@ export class KnobElement extends HTMLElement {
                 })
               )}
             </defs>
-            <g part="rotary-outer" ref={$.ref.rotary} onpointerdown={onPointerDown}>
+            <g
+              part="rotary-outer"
+              ref={$.ref.rotary}
+              onpointermove={() => {
+                $.isHovering = true
+              }}
+              onpointerleave={() => {
+                $.isHovering = false
+              }}
+              onwheel={$.event.not.passive(e => {
+                if ($.isHovering) {
+                  e.stopPropagation()
+                  e.preventDefault()
+                  onWheel(e)
+                }
+              })}
+              onpointerdown={onPointerDown}
+            >
               <Circle />
               {marks.count >= 2 && <Marks />}
               {leds.count > 0 && <Leds />}
