@@ -37,10 +37,10 @@ export const drawLeds = memoize(
             ? normal < 0.5
               ? n >= half - (half - amount) && n < half // 0..0.5
               : normal > 0.5
-              ? n <= count - (count - amount) && n >= half - 0.9 // 0.5..1
-              : false
+                ? n <= count - (count - amount) && n >= half - 0.9 // 0.5..1
+                : false
             : n < amount
-                + +(n >= count / 2) * 0.01 // this because otherwise never reaches 100%, after .5 we push a little
+            + +(n >= count / 2) * 0.01 // this because otherwise never reaches 100%, after .5 we push a little
         )
         ^ +!inverse
       ) { // finally XOR condition on inverse
@@ -67,9 +67,9 @@ export const drawMarks = memoize(
       n++, i++, a += step
     ) {
       const length = i === 0 || n === (count - 1) / 2 || (n + 1 >= count - (skip
-              ? 1
-              : 0))
-          || marks.includes(a.toPrecision(2))
+        ? 1
+        : 0))
+        || marks.includes(a.toPrecision(2))
         ? big
         : small
       path.push(`M 50 50 m ${trig(a, radius)} l ${trig(a, length)}`)
@@ -148,8 +148,6 @@ const arc = memoize((x: number, y: number, radius: number, startAngle: number, e
 })
 
 export const drawShape = memoize((count: number, radius: number, tension = 2, edge = 3, gap = 5) => {
-  count = count * 3 // ?????
-
   const slice = (Math.PI * 2) / count
   const start = -Math.PI
   const center = vec(50, 50)
@@ -159,8 +157,8 @@ export const drawShape = memoize((count: number, radius: number, tension = 2, ed
     const pos = i * slice
     const a = start + pos
     const point = vec(
-      center.x + cos(a) * radius - Math.tanh(cos(pos) * (i % gap ? 1 : -1)) * edge,
-      center.y + sin(a) * radius - Math.tanh(sin(pos) * (i % gap ? 1 : -1)) * edge
+      center.x + cos(a) * radius - (cos(pos) * (i % gap ? 1 : -1)) * edge,
+      center.y + sin(a) * radius - (sin(pos) * (i % gap ? 1 : -1)) * edge
     )
     points.push(point)
   }

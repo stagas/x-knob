@@ -27,6 +27,7 @@
     "emitDeclarationOnly": true,
     "moduleResolution": "node",
     "useDefineForClassFields": true,
+    "exactOptionalPropertyTypes": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "esModuleInterop": true,

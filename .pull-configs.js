@@ -60,10 +60,11 @@ const deprecated = [
   'vite.config.js',
   'jest.config.js',
   'web-test-runner.config.js',
+  'dprint.json'
 ]
-deprecated.forEach(x => {
+deprecated.forEach((x) => {
   try {
     fs.rmSync(x, { recursive: true })
     console.log('removed', x)
-  } catch {}
+  } catch { }
 })

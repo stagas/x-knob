@@ -1,33 +1,64 @@
-import type { KnobElement } from './'
 import * as Filters from './filters'
 
-export const themes: Record<
-  string,
-  Omit<
-    Omit<Partial<KnobElement>, 'children'>,
-    keyof JSX.HTMLAttributes<KnobElement>
-  >
-> = {
+export const themes: any = {
+  // ableton: {
+  //   extraCss: /*css*/ `
+  //     [part=line] {
+  //       stroke:var(--white);
+  //     }
+  //     [part=fill] {
+  //       stroke:none;
+  //     }`,
+  //   gap: 37,
+  //   fill: {
+  //     radius: 48,
+  //     size: 3,
+  //     gap: 6,
+  //   },
+  //   circle: 39,
+  //   line: {
+  //     size: 29.5,
+  //     pos: 20.5,
+  //     width: 3.5,
+  //   },
+  // },
   ableton: {
-    extraCss: /*css*/ `
-      [part=line] {
-        stroke:var(--white)
-      }
-      [part=fill] {
-        stroke:none
-      }`,
-    gap: 37,
+    circle: 47,
+    // gap: 90,
+    gap: 0.0001,
+    border: 0,
     fill: {
-      radius: 30,
-      size: 3,
-      gap: 6,
+      radius: 40,
+      size: 2.5,
+      gap: 0,
     },
-    circle: 39,
     line: {
-      size: 29.5,
-      pos: 20.5,
-      width: 3.5,
+      size: 42.5,
+      pos: 7,
+      width: 2.5,
     },
+    shape: {
+      radius: 0,
+      notches: 15,
+      tension: 1.6,
+      edge: 1.4,
+      gap: 5,
+    },
+    extraCss:
+      /*css*/`
+      [part=shape] {
+        fill: var(--black);
+      }
+      [part=line] {
+        stroke: var(--white);
+      }
+      [part=outline] {
+        stroke-width: 0px;
+      }
+      [part=circle] {
+        fill: transparent;
+      }
+    `,
   },
   retro: {
     extraCss: /*css*/ `
@@ -150,8 +181,12 @@ export const themes: Record<
   },
   sweet: {
     extraCss: /*css*/ `
+      [part=line] {
+        stroke:var(--dark);
+      }
       [part=outline] {
-        display:none
+        fill: transparent;
+        stroke: transparent;
       }`,
     gap: 58,
     marks: {
@@ -161,8 +196,8 @@ export const themes: Record<
       small: 4,
     },
     fill: {
-      radius: 37,
-      size: 3.5,
+      radius: 47,
+      size: 4,
       gap: 6,
     },
     // cone: {
@@ -171,15 +206,81 @@ export const themes: Record<
     //   shine: 1.92,
     //   contrast: 1.1,
     // },
-    circle: 35.2,
-    line: { size: 20, pos: 25, width: 6.5 },
+    circle: 0,
+    line: {
+      size: 20,
+      pos: 15,
+      width: 6.5
+    },
     shape: {
-      radius: 47,
-      notches: 15,
+      radius: 65,
+      notches: 45,
       tension: 1.6,
       edge: 1.4,
       gap: 5,
     },
+    minMax: {
+      size: 11,
+      pos: 4,
+      space: -5,
+    },
+  },
+  sweetLow: {
+    extraCss: /*css*/ `
+      [part=line] {
+        stroke: #000;
+      }
+      [part=outline] {
+        fill: transparent;
+        stroke: transparent;
+      }`,
+    gap: 58,
+    marks: {
+      count: 0,
+      radius: 40,
+      big: 7,
+      small: 4,
+    },
+    fill: {
+      radius: 47.5,
+      size: 4.5,
+      gap: 6,
+    },
+
+    shape: {
+      radius: 62,
+      notches: 35,
+      tension: 2.15,
+      edge: 1.3,
+      gap: 5,
+    },
+
+    // cone: {
+    //   radius: 37,
+    //   rays: 30,
+    //   shine: 1.92,
+    //   contrast: 1.1,
+    // },
+    circle: 45,
+    line: {
+      size: 26,
+      pos: 14,
+      width: 8
+    },
+    // shape: {
+    //   radius: 60,
+    //   notches: 6,
+    //   tension: 2.1,
+    //   edge: 1.4,
+    //   gap: 2,
+    // },
+    // shape: {
+    //   radius: 60,
+    //   notches: 13,
+    //   tension: 0.86,
+    //   edge: 2,
+    //   gap: 6.5,
+    // },
     minMax: {
       size: 11,
       pos: 4,
@@ -312,7 +413,7 @@ export const themes: Record<
     },
     shape: {
       radius: 55,
-      notches: 3,
+      notches: 9,
       tension: 0.9,
       edge: 4,
       gap: 10,
@@ -328,6 +429,135 @@ export const themes: Record<
       space: -8,
     },
   },
+  cowbell: {
+    extraCss: /*css*/`
+      [part=outline] {
+        fill: transparent;
+        stroke-width: 4px;
+        display: none;
+      }
+    `,
+    // extraCss: /*css*/ `
+    //   [part=shape] {
+    //     /* fill: var(--black) */
+    //   }
+    //   [part=line] {
+    //     /* fill: #fff; */
+    //     /* stroke: #fff; */
+    //   }
+    //   [part=rotary-line] {
+    //     /* stroke: #000; */
+    //     /* fill: #fff; */
+    //   }
+    //   [part=outline] {
+    //     stroke-width: 0px;
+    //   }
+    //   [part=rotary] {
+    //     /* filter: drop-shadow(0.5px 2px 2px #0005); */
+    //   }
+    //   [part=circle] {
+    //     /* stroke: var(--black); */
+    //     /* fill: var(--black); */
+    //   }`,
+    // // gap: 100,
+    filters: {
+      rotaryKnob: [
+        {
+          Filter: Filters.Inset,
+          dx: 0,
+          dy: -2,
+          blur: 2.15,
+          color: '#000',
+        },
+        {
+          Filter: Filters.Inset,
+          dx: 0,
+          dy: 2,
+          blur: 2.15,
+          color: '#b9f7',
+        },
+      ]
+      // rotaryKnob: [
+      //   {
+      //     Filter: Filters.Shine,
+      //     scale: -.5,
+      //     blur: 15,
+      //     color: '#4488ff',
+      //     con: 18,
+      //     exp: 30,
+      //     x: 50,
+      //     y: -1,
+      //     z: 50,
+      //   },
+      // ],
+      // rotaryLine: [
+      //   {
+      //     Filter: Filters.Inset,
+      //     dx: 1.2,
+      //     dy: 1.35,
+      //     blur: 1.15,
+      //     color: '#000',
+      //   },
+      // ],
+    },
+    // marks: {
+    //   count: 5,
+    //   radius: 40,
+    //   big: 7,
+    //   small: 4,
+    // },
+    // leds: {
+    //   count: 0,
+    //   size: 5,
+    //   radius: 30,
+    // },
+    circle: 42,
+    line: {
+      size: 25,
+      pos: 20,
+      width: 3,
+    },
+    // shape: {
+    //   radius: 55,
+    //   notches: 9,
+    //   tension: 0.9,
+    //   edge: 4,
+    //   gap: 10,
+    // },
+    fill: {
+      radius: 45,
+      size: 2,
+      gap: 4,
+    },
+
+    gap: 90,
+    // marks: {
+    //   count: 0,
+    //   radius: 40,
+    //   big: 7,
+    //   small: 4,
+    // },
+    // fill: {
+    //   radius: 47.5,
+    //   size: 4.5,
+    //   gap: 6,
+    // },
+
+    shape: {
+      radius: 65,
+      notches: 35,
+      tension: 2.15,
+      edge: 1.3,
+      gap: 5,
+    },
+
+    // minMax: {
+    //   size: 12,
+    //   pos: 0,
+    //   space: -8,
+    // },
+  },
+
   intense: {
     extraCss: /*css*/ `
       [part=shape] {
@@ -381,7 +611,6 @@ export const themes: Record<
       size: 5,
       radius: 30,
     },
-    circle: void 0,
     line: {
       size: 8,
       pos: 27,
@@ -524,12 +753,13 @@ export const themes: Record<
     },
   },
   zen: {
-    circle: 40,
+    circle: 47,
     gap: 0,
+    border: 0,
     fill: {
-      radius: 34,
-      size: 2.5,
-      gap: 6,
+      radius: 47,
+      size: 4,
+      gap: 0,
     },
     line: {
       size: 0,
@@ -537,7 +767,43 @@ export const themes: Record<
       width: 6.5,
     },
     dot: {
+      size: 3,
+      pos: 17.2,
+    },
+    minMax: {
+      size: 0,
+      pos: 10,
+      space: 10,
+    },
+    shape: {
+      radius: 0,
+      notches: 15,
+      tension: 1.6,
+      edge: 1.4,
+      gap: 5,
+    },
+    extraCss:
+      '\n      [part=shape] {\n        fill: var(--black)\n      }\n      [part=line] {\n        stroke: var(--light)\n      }\n      [part=outline] {\n        stroke-width: 0px;\n      }\n      [part=circle] {\n               fill: var(--black);\n      }',
+  },
+  circle: {
+    circle: 38,
+    border: {
+      radius: 48,
       size: 2,
+    },
+    gap: 0,
+    fill: {
+      radius: 36,
+      size: 10,
+      gap: 0,
+    },
+    line: {
+      size: 0,
+      pos: 25,
+      width: 6.5,
+    },
+    dot: {
+      size: 0,
       pos: 27,
     },
     minMax: {
@@ -546,14 +812,30 @@ export const themes: Record<
       space: 10,
     },
     shape: {
-      radius: 19.905180883293024,
+      radius: 0,
       notches: 15,
       tension: 1.6,
       edge: 1.4,
       gap: 5,
     },
-    extraCss:
-      '\n      [part=shape] {\n        fill: var(--black)\n      }\n      [part=line] {\n        stroke: var(--light)\n      }\n      [part=outline] {\n        stroke-width: 0px;\n      }\n      [part=circle] {\n        stroke: var(--black);\n        fill: var(--black);\n      }',
+    extraCss: /*css*/ `
+      [part=shape] {
+        fill: var(--black);
+      }
+      [part=fill] {
+        stroke: transparent;
+      }
+      [part=line] {
+        stroke: transparent;
+        fill: transparent;
+      }
+      [part=outline] {
+        stroke-width: 0px;
+      }
+      [part=circle] {
+        stroke: transparent;
+        fill: transparent;
+      }`,
   },
   // compass: {
   //   gap: 0,
