@@ -267,7 +267,10 @@ export const Knob = web(view('knob', class props {
       $.scale = max - min
     })
 
-    fx(({ ownValue: value, min, max }) => {
+    fx(({ ownValue: value, min, max, scale, symmetric }) => {
+      if (symmetric && (value - min) >= scale * 0.485 && (value - min) <= scale * 0.515) {
+        value = scale * 0.5 + min
+      }
       $.ownValue = Math.max(min, Math.min(max, value))
     })
 
@@ -370,8 +373,6 @@ export const Knob = web(view('knob', class props {
       return chain(off, offOnce)
     })
 
-
-
     const Border = part((update) => {
       fx(({ border }) => {
         update(<circle part="border" cx="50" cy="50" r={border ? border.radius : 38} />)
@@ -406,7 +407,7 @@ export const Knob = web(view('knob', class props {
           <path part="fill" d={drawFill(normal, fill.radius, fill.gap, gap, symmetric)}
             vector-effect="non-scaling-stroke"
           />
-          {normal > 0 && <path part="fill-value" d={drawFill(normal, fill.radius, fill.gap, gap, symmetric, true)}
+          {((normal > 0) || symmetric) && <path part="fill-value" d={drawFill(normal, fill.radius, fill.gap, gap, symmetric, true)}
             vector-effect="non-scaling-stroke"
           />}
         </g>)
